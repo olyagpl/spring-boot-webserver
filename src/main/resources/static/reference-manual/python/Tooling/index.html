@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:image" content='/resources/img/graalvm.png' />
+  <meta name="twitter:widgets:border-color" content="#55acee">
+
+  <title>
+    
+      GraalVM
+    
+  </title>
+  <meta name="description" content="GraalVM is an advanced JDK with ahead-of-time Native Image compilation."/>
+
+  <link rel="icon" id="favicon" href='/resources/img/favicon/favicon-light/favicon-light.ico'>
+
+  <link rel="manifest" href='/resources/img/favicon/site.webmanifest'>
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+
+  <script src='/resources/lib/jquery/jquery-3.6.1.min.js'></script>
+  <link rel="stylesheet" href='/assets/main.css'>
+  <script src='/resources/lib/bootstrap/js/bootstrap.min.js'></script>
+  <script src='/resources/lib/highlight/highlight.pack.js'></script>
+  <script src='/resources/lib/purl/purl.js'></script>
+  <script src='/resources/lib/fiddle/fiddle.js' defer></script>
+  <link rel="stylesheet" href='/resources/styles/fiddle.css'>
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+</head>
+
+  <body class="preload">
+
+    <div>
+      <header  class="header header--content"  role="banner">
+
+  
+
+  <div class="container-fluid container-fluid--custom-sm">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-12 col-lg-10">
+        <div class="d-flex">
+          <a href="https://www.graalvm.org/">
+            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+          </a>  
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+      <main class="content content--home wrapper" aria-label="Content">
+        <div class="wrapper wrapper-content">
+  <div class="container-fluid container-fluid--custom-sm">
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
+      <br>
+      <a href="/index.html" class="link-back"><i>&#9664;</i>Table of Contents</a>
+
+      <h1 id="tooling-support-for-python">Tooling Support for Python</h1>
+<p>GraalPy can run many standard Python tools as well as tools from the GraalVM ecosystem.
+The <code>graalpy --help:tools</code> command will give you more information about GraalVM tools currently supported on Python.</p>
+
+<h2 id="debugger">Debugger</h2>
+<p>The built-in <code>breakpoint()</code> function uses <code>pdb</code> by default.</p>
+
+<h3 id="pdb">PDB</h3>
+<p>The standard python debugger <code>pdb</code> is supported on GraalPy. Refer to the official <a href="https://docs.python.org/3/library/pdb.html">PDB documentation</a> for usage.</p>
+
+<h3 id="chrome-inspector">Chrome Inspector</h3>
+<p>To enable <a href="/tools/chrome-debugger/">GraalVM’s Chrome Inspector</a> debugger, pass the <code>--inspect</code> option to the <code>graalpy</code> launcher.
+The built-in <code>breakpoint()</code> function will work using the Chrome Inspector implementation.</p>
+
+<h2 id="code-coverage">Code Coverage</h2>
+
+<p>GraalPy comes with a coverage instrument that can be used with the <code>--coverage</code> option.
+Use the <code>graalpy --help:tools</code> command to see usage details.</p>
+
+<p>In order to work better with existing Python code, the standard library <code>trace</code> module is partially supported with this low-overhead coverage instrument.
+So, for example, you trace a script as follows:</p>
+
+<pre><code class="language-bash">graalpy -m trace -m -c -s my_script.py
+</code></pre>
+
+<p>This works in the same way as CPython.</p>
+
+<p>The programmatic API also works, with some limitations.
+For example, it does not currently track calls, only line counts and called functions.</p>
+
+<h2 id="profiling">Profiling</h2>
+
+<p>The <code>_lsprof</code> built-in module is implemented using the GraalVM <code>cpusampler</code> tool.
+Not all profiling features are currently supported, but basic profiling works. For example:</p>
+
+<pre><code class="language-bash">graalpy -m cProfile -s calls -m ginstall --help
+</code></pre>
+
+<p>The interactive exploration of a stats output file also works:</p>
+
+<pre><code class="language-bash">graalpy -m cProfile -o ginstall.profile -m ginstall --help
+graalpy -m pstats ginstall.profile
+ginstall.profile%
+callers
+[...]
+</code></pre>
+
+<p>The <code>profile</code> module works as well:</p>
+
+<pre><code class="language-bash">graalpy -m profile -s calls -m ginstall --help
+</code></pre>
+
+<p>or</p>
+
+<pre><code class="language-bash">&gt;&gt;&gt; import profile
+&gt;&gt;&gt; profile.run('l = []; l.append(1)')
+         5 function calls in 0.002 seconds
+
+   Ordered by: standard name
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.000    0.000 :0(_setprofile)
+        1    0.000    0.000    0.000    0.000 :0(append)
+        1    0.000    0.000    0.001    0.001 :0(exec)
+        1    0.000    0.000    0.000    0.000 &lt;string&gt;:1(&lt;module&gt;)
+        1    0.001    0.001    0.002    0.002 profile:0(l = []; l.append(1))
+        0    0.000             0.000          profile:0(profiler)
+</code></pre>
+
+      </div>
+  </div>
+</div>
+
+</div>
+
+      </main>
+      <footer class="footer footer__mobile">
+  <div class="container-fluid container-fluid--custom-sm">
+    <div class="row footer-content">
+      <div class="footer__columns">
+        <div class="footer__columns-item">
+          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <div class="grow">
+            <ul class="footer-list">
+              <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
+              <li class="footer-list__item"><a href="https://www.graalvm.org/truffle/javadoc/">GraalVM Truffle Javadoc</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer__columns-item">
+          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <div class="grow">
+            <ul class="footer-list">
+              <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
+              <li class="footer-list__item"><a href="https://www.graalvm.org/release-notes/" target="_blank">Release notes</a></li>
+              <li class="footer-list__item"><a href="https://github.com/graalvm/graalvm-demos/"
+                  target="_blank">Demos</a></li>
+              <li class="footer-list__item"><a href="https://medium.com/graalvm" target="_blank">Blog</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="row">
+        <div class="col-sm-12">
+          <p class="copyright">
+            Copyright © 2024, Oracle and/or its affiliates. All rights reserved. Oracle and Java are registered trademarks. Other names may be trademarks of their respective owners.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function fadeInAndOut(thz) {
+    var elmt = thz.nextElementSibling;//Get the element that is below the button that
+    //was just clicked
+    if (elmt.clientHeight) {
+      elmt.style.height = 0;
+    } else {
+      var wrapper = elmt.querySelector('ul');
+      elmt.style.height = wrapper.clientHeight + "px";
+    }
+  }
+</script>
+
+    </div>
+
+    <div class="overlay"></div>
+
+    <script src='/resources/js/main.js'></script>
+  </body>
+
+</html>

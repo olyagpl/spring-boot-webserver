@@ -1,0 +1,157 @@
+<h1 id="debug-native-executables-with-gdb">Debug Native Executables with GDB</h1>
+
+<p>A generated native executable is heavily optimized code with minimal symbol information which makes debugging harder.
+This can be solved by embedding debug information into the resulting binary at build time.
+This information tells the debugger precisely how to interpret the machine code and point it back to the original Java method.</p>
+
+<p>In this guide you will learn how to debug a native executable using the standard Linux GNU Debugger (GDB).</p>
+
+<blockquote>
+  <p>Note: Native Image debugging with GDB currently works on Linux with initial support for macOS. The feature is experimental.</p>
+</blockquote>
+
+<h3 id="run-a-demo">Run a Demo</h3>
+
+<p>To build a native executable with debug information, provide the <code>-g</code> command-line option for <code>javac</code> when compiling the application, and then to the <code>native-image</code> builder.
+This enables source-level debugging, and the debugger (GDB) then correlates machine instructions with specific source lines in Java files.</p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<ul>
+  <li>Linux AMD64</li>
+  <li>GDB 10.1 or higher</li>
+</ul>
+
+<p>Follow the steps to test debugging a native executable with GDB. The below workflow is known to work on Linux with GDB 10.1.</p>
+
+<ol>
+  <li>Download and install the latest GraalVM JDK with Native Image using the <a href="https://github.com/graalvm/graalvm-jdk-downloader">GraalVM JDK Downloader</a>:
+    <pre><code class="language-bash"> bash &lt;(curl -sL https://get.graalvm.org/jdk)
+</code></pre>
+  </li>
+  <li>
+    <p>Save the following code to the file named <em>GDBDemo.java</em>.</p>
+
+    <pre><code class="language-java"> public class GDBDemo {
+     static long fieldUsed = 1000;
+
+     public static void main(String[] args) {
+         if (args.length &gt; 0) {
+             int n = -1;
+             try {
+                 n = Integer.parseInt(args[0]);
+             } catch (NumberFormatException ex) {
+                 System.out.println(args[0] + " is not a number!");
+             }
+             if (n &lt; 0) {
+                 System.out.println(args[0] + " is negative.");
+             }
+             double f = factorial(n);
+             System.out.println(n + "! = " + f);
+         } 
+
+         if (false)
+             neverCalledMethod();
+
+         StringBuilder text = new StringBuilder();
+         text.append("Hello World from GraalVM Native Image and GDB in Java.\n");
+         System.out.println(text.toString());
+     }
+
+     static void neverCalledMethod() {
+         System.out.println("This method is unreachable and will not be included in the native executable.");
+     }
+
+     static double factorial(int n) {
+         if (n == 0) {
+             return 1;
+         }
+         if (n &gt;= fieldUsed) {
+             return Double.POSITIVE_INFINITY;
+         }
+         double f = 1;
+         while (n &gt; 1) {
+             f *= n--;
+         }
+         return f;
+     }
+ }
+</code></pre>
+  </li>
+  <li>
+    <p>Compile it and generate a native executable with debug information:</p>
+
+    <pre><code class="language-shell"> $JAVA_HOME/bin/javac -g GDBDemo.java
+</code></pre>
+    <pre><code class="language-shell"> native-image -g -O0 GDBDemo
+</code></pre>
+    <p>The <code>-g</code> option instructs <code>native-image</code> to generate debug information. The resulting native executable will contain debug records in a format GDB understands.</p>
+
+    <p>Notice that you can also pass <code>-O0</code> which specifies that no compiler optimizations should be performed. Disabling all optimizations is not required, but in general it makes the debugging experience better.</p>
+  </li>
+  <li>
+    <p>Launch the debugger and run your native executable:</p>
+
+    <pre><code class="language-shell"> gdb ./gdbdemo
+</code></pre>
+    <p>The <code>gdb</code> prompt will open.</p>
+  </li>
+  <li>
+    <p>Set a breakpoint: type <code>breakpoint &lt;java method&gt;</code> to set a breakpoint and <code>run &lt;arg&gt;</code> to run the native executable. You can put breakpoints configured by file and line, or by method name. See below the example of a debugging session.</p>
+
+    <pre><code class="language-shell"> $ gdb ./gdbdemo
+ GNU gdb (GDB) 10.2
+ Copyright (C) 2021 Free Software Foundation, Inc.
+ ...
+ Reading symbols from ./gdbdemo...
+ Reading symbols from /dev/gdbdemo.debug...
+ (gdb) info func ::main
+ All functions matching regular expression "::main":
+
+ File GDBDemo.java:
+ 5:	void GDBDemo::main(java.lang.String[]*);
+ (gdb) b ::factorial
+ Breakpoint 1 at 0x2d000: file GDBDemo.java, line 32.
+ (gdb) run 42
+ Starting program: /dev/gdbdemo 42
+ Thread 1 "gdbdemo" hit Breakpoint 1, GDBDemo::factorial (n=42) at GDBDemo.java:32
+ 32	        if (n == 0) {
+ (gdb) info args
+ n = 42
+ (gdb) step
+ 35	        if (n &gt;= fieldUsed) {
+ (gdb) next
+ 38	        double f = 1;
+ (gdb) next
+ 39	        while (n &gt; 1) {
+ (gdb) info locals
+ f = 1
+ (gdb) ...
+</code></pre>
+  </li>
+</ol>
+
+<p>In case your native executable segfaults, you can print the backtrace of the entire stack (<code>bt</code>).</p>
+
+<p>The debugger points machine instructions back from the binary to specific source lines in Java files. Note that single stepping within a compiled method includes file and line number information for inlined code. GDB may switch files even though you are still in the same compiled method.</p>
+
+<p>Most of the regular debugging actions are supported by GDB, namely:</p>
+
+<ul>
+  <li>single stepping including both into and over function calls</li>
+  <li>stack backtraces (not including frames detailing inlined code)</li>
+  <li>printing of primitive values</li>
+  <li>structured, field by field, printing of Java objects</li>
+  <li>casting and printing objects at different levels of generality</li>
+  <li>access through object networks via path expressions</li>
+  <li>reference by name to methods and static field data</li>
+</ul>
+
+<p>The generation of debug information is implemented by modeling the Java program as an equivalent C++ program. Since GDB was primarily designed for debugging C (and C++), there are certain considerations to be taken into account when debugging Java applications. 
+Read more about Native Image debugging support in the <a href="/reference-manual/native-image/debugging-and-diagnostics/DebugInfo/#special-considerations-for-debugging-java-from-gdb">reference documentation</a>.</p>
+
+<h3 id="related-documentation">Related Documentation</h3>
+
+<ul>
+  <li><a href="/reference-manual/native-image/debugging-and-diagnostics/DebugInfo/">Debug Info Feature</a></li>
+</ul>

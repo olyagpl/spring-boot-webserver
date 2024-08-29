@@ -1,10 +1,9 @@
 # Multi-Cloud Apps with GraalVM - Up and Running
 
-This workshop is for developers looking to understand better how to **build size-optimized cloud native Java applications** using [GraalVM Native Image](https://docs.oracle.com/en/graalvm/jdk/22/docs/reference-manual/native-image/). You are going to discover ways to minimize application footprint by taking advantage of different Native Image linking options and packaging into various base containers. 
+This workshop is for developers looking to understand better how to **build size-optimized cloud native Java applications** using [GraalVM Native Image](https://www.graalvm.org/jdk21/reference-manual/native-image/). You are going to discover ways to minimize application footprint by taking advantage of different Native Image linking options and packaging into various base containers. 
 
 For the demo part, you will run a Spring Boot web server application, hosting the GraalVM website. 
 Spring Boot 3 has integrated support for GraalVM Native Image, making it easier to set up and configure a project.
-This application is enhanced with the [GraalVM Native Image Maven plugin](https://graalvm.github.io/native-build-tools/latest/index.html). 
 Compiling a Spring Boot application ahead of time can significantly boost the performance and reduce its footprint.
 
 ### Workshop Objectives
@@ -97,7 +96,7 @@ See how much reduction in size you can gain.
 
 Jlink, or `jlink`, is a tool that generates a custom Java runtime image that contains only the platform modules that are required for your application. This is one of the approaches to create cloud native applications introduced in Java 11.
 
-The script _build-jlink-runner.sh_ that runs `docker build` using the _Dockerfile.distroless-java-base.jlink_.
+The script _build-jlink.sh_ that runs `docker build` using the _Dockerfile.distroless-java-base.jlink_.
 The Dockerfile contains a multistage build: first it generates a Jlink custom runtime on a full JDK; then copies the runtime image folder along with static website pages into a Java base container image, and sets the entrypoint.
 
 The application does not have to be modular, but you need to figure out which modules the application depends on to be able to `jlink` it. 
@@ -304,6 +303,9 @@ The script _build-dynamic-image.sh_, available in this repository for your conve
 ### Action
 
 1. This step requires to install [GraalVM for JDK 23 Early Access Build](https://github.com/graalvm/oracle-graalvm-ea-builds/releases). Run the commands one by one:
+    ```
+    cd ..
+    ```
     ```bash
     wget -q https://github.com/graalvm/oracle-graalvm-ea-builds/releases/download/jdk-23.0.0-ea.23/graalvm-jdk-23.0.0-ea.23_linux-x64_bin.tar.gz && tar -xzf graalvm-jdk-23.0.0-ea.23_linux-x64_bin.tar.gz && rm -f graalvm-jdk-23.0.0-ea.23_linux-x64_bin.tar.gz
     ```
@@ -318,6 +320,9 @@ The script _build-dynamic-image.sh_, available in this repository for your conve
     ```
     ```bash
     java -version
+    ```
+    ```
+    cd spring-boot-webserver
     ```
 
 2. Run the script to build a size-optimized native executable and package it into a container:
@@ -517,7 +522,7 @@ A separate Maven profile exists for this step:
     ```
     The container size shrinked to **96.4MB**! A _scratch_ container weights only **14.5MB**.
 
-## **STEP 9**: Compress a Static Native Image with UPX and Run Inside a Container
+## **STEP 8**: Compress a Static Native Image with UPX and Run Inside a Container
 
 _Not convincing? What can you do next to reduce the size even more?_
 
@@ -584,7 +589,7 @@ It can significantly reduce the executable size, but note, that UPX loads the ex
     The container size reduced dramatically to just **36.2MB**.
     The application and container image's size were now shrinked to the minimum.
 
-## **STEP 10**: Clean up (Optional)
+## **STEP 9**: Clean up (Optional)
 
 To clean up all images, run the `./clean.sh` script provided for that purpose. 
 

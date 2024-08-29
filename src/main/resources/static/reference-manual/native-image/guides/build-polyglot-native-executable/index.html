@@ -1,0 +1,103 @@
+<h1 id="build-a-polyglot-native-executable-java-and-javascript">Build a Polyglot Native Executable (Java and JavaScript)</h1>
+
+<p>With <a href="https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/package-summary.html">GraalVM Polyglot API</a> you can embed and run code from a guest language in a Java-based host application.
+GraalVM makes it possible to ahead-of-time compile a Java application with embedded JavaScript too and create a polyglot native executable. 
+<a href="/reference-manual/embed-languages/">Embedding Reference</a> on how to interact with a guest language like JavaScript from a Java host application for more information.</p>
+
+<p>This guide will show how to build a polyglot native executable with Java host language and JavaScript as a guest language.</p>
+
+<p>For a demo, you will use this JSON Pretty Printer Java application that prints the output in the JSON format:</p>
+
+<pre><code class="language-java">import java.io.*;
+import java.util.stream.*;
+import org.graalvm.polyglot.*;
+
+public class PrettyPrintJSON {
+  public static void main(String[] args) throws java.io.IOException {
+    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    String input = reader.lines()
+    .collect(Collectors.joining(System.lineSeparator()));
+    try (Context context = Context.create("js")) {
+      Value parse = context.eval("js", "JSON.parse");
+      Value stringify = context.eval("js", "JSON.stringify");
+      Value result = stringify.execute(parse.execute(input), null, 2);
+      System.out.println(result.asString());
+    }
+  }
+} 
+</code></pre>
+
+<ol>
+  <li>
+    <p>Make sure you have installed a GraalVM JDK.
+The easiest way to get started is with <a href="https://sdkman.io/jdks#graal">SDKMAN!</a>.
+For other installation options, visit the <a href="https://www.graalvm.org/downloads/">Downloads section</a>.</p>
+  </li>
+  <li>
+    <p>Install the JavaScript runtime:</p>
+
+    <pre><code> gu install js
+</code></pre>
+  </li>
+  <li>
+    <p>Save the above application in a file named <em>PrettyPrintJSON.java</em> and compile it:</p>
+
+    <pre><code class="language-shell"> javac PrettyPrintJSON.java
+</code></pre>
+  </li>
+  <li>
+    <p>Build a native executable by enabling the JavaScript interoperability:</p>
+
+    <pre><code class="language-shell"> native-image --language:js PrettyPrintJSON
+</code></pre>
+    <p>The <code>--language:js</code> argument ensures that JavaScript is available in the generated image.
+ It will take several minutes as it does not just build the executable, but also pulls in the JavaScript engine.</p>
+
+    <blockquote>
+      <p>Note: Building a polyglot native executable requires more physical memory because the Truffle framework is included.</p>
+    </blockquote>
+  </li>
+  <li>
+    <p>Run the resulting executable and perform some pretty-printing:</p>
+
+    <pre><code class="language-shell"> ./prettyprintjson &lt;&lt;EOF
+ {"GraalVM":{"description":"Language Abstraction Platform","supports":["combining languages","embedding languages","creating native images"],"languages": ["Java","JavaScript","Node.js", "Python", "Ruby","R","LLVM"]}}
+ EOF
+</code></pre>
+    <p>The expected output is:</p>
+
+    <pre><code class="language-JSON"> {
+ "GraalVM": {
+     "description": "Language Abstraction Platform",
+     "supports": [
+     "combining languages",
+     "embedding languages",
+     "creating native images"
+     ],
+     "languages": [
+     "Java",
+     "JavaScript",
+     "Node.js",
+     "Python",
+     "Ruby",
+     "R",
+     "LLVM"
+     ]
+ }
+ }
+</code></pre>
+  </li>
+</ol>
+
+<p>The native executable version runs faster than running the same application on the JVM.</p>
+
+<blockquote>
+  <p>Note: JavaScript support by GraalVM Native Image is considered general availability. The remaining languages support is experimental.</p>
+</blockquote>
+
+<h3 id="related-documentation">Related Documentation</h3>
+
+<ul>
+  <li><a href="/reference-manual/embed-languages/">Embedding Languages</a></li>
+  <li><a href="/reference-manual/js/JavaInteroperability/">JavaScript and Java Interoperability</a></li>
+</ul>
