@@ -1,4 +1,4 @@
-FROM container-registry.oracle.com/graalvm/jdk:21 AS build
+FROM container-registry.oracle.com/graalvm/jdk:23 AS build
 COPY . /webserver
 WORKDIR /webserver
 RUN ./mvnw clean package

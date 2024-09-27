@@ -22,22 +22,10 @@ In this workshop you will:
 * x86 Linux
 * `musl` toolchain
 * Container runtime such as [Rancher Desktop](https://docs.rancherdesktop.io/getting-started/installation/) or [Docker](https://www.docker.com/gettingstarted/) installed and running
-* [GraalVM for JDK 21](https://www.graalvm.org/downloads/). Install it from archive, point environment variables to it, and check the `java` version: 
-```bash
-wget -q https://download.oracle.com/graalvm/21/latest/graalvm-jdk-21_linux-x64_bin.tar.gz && tar xvzf graalvm-jdk-21_linux-x64_bin.tar.gz && rm -f graalvm-jdk-21_linux-x64_bin.tar.gz
-```
-```bash
-export JAVA_HOME=/path/to/graalvm-jdk-21.0.4+8.1
-```
-```bash
-export GRAALVM_HOME=$JAVA_HOME
-```
-```bash
-export PATH=$JAVA_HOME/bin:$PATH
-```
-```bash
-java -version
-```
+* [GraalVM for JDK 23](https://www.graalvm.org/downloads/) or later. We recommend using [SDKMAN!](https://sdkman.io/). (For other download options, see [GraalVM Downloads](https://www.graalvm.org/downloads/).)
+    ```bash
+    sdk install java 23-graal
+    ```
 
 ## Setup
 
@@ -56,7 +44,7 @@ It requires a container image with a full JDK and runtime libraries.
 
 ### Explanation
 
-The Dockerfile, provided for this step, _Dockerfile.distroless-base.uber-jar_, uses [Oracle GraalVM for JDK 21 container image](https://docs.oracle.com/en/graalvm/jdk/21/docs/getting-started/container-images/) for the builder, and [Debian Slim Linux image](https://github.com/linuxcontainers/debian-slim) for the runtime.
+The Dockerfile, provided for this step, _Dockerfile.distroless-base.uber-jar_, uses [Oracle GraalVM for JDK 23 container image](https://docs.oracle.com/en/graalvm/jdk/23/docs/getting-started/container-images/) for the builder, and [Debian Slim Linux image](https://github.com/linuxcontainers/debian-slim) for the runtime.
 The entrypoint for this image is equivalent to `java -jar`, so only a path to a JAR file is specified in `CMD`.
 
 ### Action
@@ -106,7 +94,7 @@ RUN ./mvnw dependency:build-classpath -Dmdep.outputFile=cp.txt
 ```
 Then, Docker runs the `jdeps` command with the classpath to check required modules for this Spring Boot application:
 ```bash
-RUN jdeps --ignore-missing-deps -q  --recursive --multi-release 21 --print-module-deps --class-path $(cat cp.txt) target/webserver-0.0.1-SNAPSHOT.jar
+RUN jdeps --ignore-missing-deps -q  --recursive --multi-release 23 --print-module-deps --class-path $(cat cp.txt) target/webserver-0.0.1-SNAPSHOT.jar
 ```
 Finally, Docker runs `jlink` to create a custom runtime in the specified output directory _jlink-jre_.
 The `ENTRYPOINT` for the application would be `java` from the custom runtime.
@@ -302,46 +290,23 @@ The script _build-dynamic-image.sh_, available in this repository for your conve
 
 ### Action
 
-1. This step requires to install [GraalVM for JDK 23 Early Access Build](https://github.com/graalvm/oracle-graalvm-ea-builds/releases). Run the commands one by one:
-    ```
-    cd ..
-    ```
-    ```bash
-    wget -q https://github.com/graalvm/oracle-graalvm-ea-builds/releases/download/jdk-23.0.0-ea.23/graalvm-jdk-23.0.0-ea.23_linux-x64_bin.tar.gz && tar -xzf graalvm-jdk-23.0.0-ea.23_linux-x64_bin.tar.gz && rm -f graalvm-jdk-23.0.0-ea.23_linux-x64_bin.tar.gz
-    ```
-    ```bash
-    export JAVA_HOME=/home/opc/graalvm-jdk-23+36.1
-    ```
-    ```bash
-    export GRAALVM_HOME=$JAVA_HOME
-    ```
-    ```bash
-    export PATH=$JAVA_HOME/bin:$PATH
-    ```
-    ```bash
-    java -version
-    ```
-    ```
-    cd spring-boot-webserver
-    ```
-
-2. Run the script to build a size-optimized native executable and package it into a container:
+1. Run the script to build a size-optimized native executable and package it into a container:
     ```bash
     ./build-dynamic-image-optimized.sh
     ```
 
-3. Once the build completes, a container image _distroless-java-base.dynamic-optimized_ should be available. Run it, mapping the ports:
+2. Once the build completes, a container image _distroless-java-base.dynamic-optimized_ should be available. Run it, mapping the ports:
     ```bash
     docker run --rm -p8080:8080 webserver:distroless-java-base.dynamic-optimized
     ```
 
     The application is running from the native image inside a container. The container started in **0.035 seconds**.
 
-4. Open a browser and navigate to [localhost:8080/](http://localhost:8080/). You see the GraalVM documentation pages served.
+3. Open a browser and navigate to [localhost:8080/](http://localhost:8080/). You see the GraalVM documentation pages served.
 
-5. Return to the terminal and stop the running container by clicking CTRL+C.
+4. Return to the terminal and stop the running container by clicking CTRL+C.
 
-6. Check the size of this container image:
+5. Check the size of this container image:
     ```bash
     docker images
     ```
@@ -357,7 +322,7 @@ The script _build-dynamic-image.sh_, available in this repository for your conve
     The size of `distroless-java-base.dynamic-optimized` container is cut down from **164MB** to **130MB**. 
     This is because the native executable reduced in size.
 
-7. Check what is the size of the native executable now:
+6. Check what is the size of the native executable now:
     ```bash
     ls -lh target/webserver
     ```
