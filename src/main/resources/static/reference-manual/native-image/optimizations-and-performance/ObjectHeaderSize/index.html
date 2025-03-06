@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:image" content='/resources/img/graalvm.png' />
+  <meta name="twitter:widgets:border-color" content="#55acee">
+
+  <title>
+    
+      GraalVM
+    
+  </title>
+  <meta name="description" content="GraalVM is an advanced JDK with ahead-of-time Native Image compilation."/>
+
+  <link rel="icon" id="favicon" href='/resources/img/favicon/favicon-light/favicon-light.ico'>
+
+  <link rel="manifest" href='/resources/img/favicon/site.webmanifest'>
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+
+  <script src='/resources/lib/jquery/jquery-3.6.1.min.js'></script>
+  <link rel="stylesheet" href='/assets/main.css'>
+  <script src='/resources/lib/bootstrap/js/bootstrap.min.js'></script>
+  <script src='/resources/lib/highlight/highlight.pack.js'></script>
+  <script src='/resources/lib/purl/purl.js'></script>
+  <script src='/resources/lib/fiddle/fiddle.js' defer></script>
+  <link rel="stylesheet" href='/resources/styles/fiddle.css'>
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+</head>
+
+  <body class="preload">
+
+    <div>
+      <header  class="header header--content"  role="banner">
+
+  
+
+  <div class="container-fluid container-fluid--custom-sm">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-12 col-lg-10">
+        <div class="d-flex">
+          <a href="https://www.graalvm.org/">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
+          </a>  
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+</header>
+      <main class="content content--home wrapper" aria-label="Content">
+        <div class="container-fluid container-fluid--custom-sm">
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
+      <br>
+      <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
+      <h1 id="object-header-size-in-native-image">Object Header Size in Native Image</h1>
+
+<p>The object header is part of every object in memory, storing metadata about the object, and its size varies depending on the JVM implementation, and specific JVM options such as compressed references.
+The size of the object header directly affects the memory footprint of a Java application, particularly if a lot of small objects are allocated.</p>
+
+<p>In Oracle GraalVM Native Image, the object header is 4 bytes by default, which is smaller than when running on HotSpot.</p>
+
+<p>For example, in a 64-bit HotSpot VM with compressed references, an instance of <code>java.lang.Object</code> consumes 16 bytes (12-byte header plus 4-byte padding).
+Using Oracle GraalVM Native Image, the same object consumes only 8 bytes, offering significant memory savings.
+However, in case of Native Image, the object size heavily depends on the used garbage collector (GC), the allocated instance type, and the state of compressed references.
+Compressed references use 32-bit instead of 64-bit, and are enabled by default in Oracle GraalVM.</p>
+
+<p>To observe the memory usage differences, consider this example application that measures thread-allocated bytes using the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.management/java/lang/management/ThreadMXBean.html">ThreadMXBean API</a>:</p>
+<pre><code class="language-java">import com.sun.management.ThreadMXBean;
+import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+
+public class ObjectSize {
+    public static void main(String[] args) {
+        long threadId = Thread.currentThread().threadId();
+        ThreadMXBean threadMXBean = (com.sun.management.ThreadMXBean) ManagementFactory.getThreadMXBean();
+        long initialValue = threadMXBean.getThreadAllocatedBytes(threadId);
+
+        int count = 12 * 1024 * 1024;
+        ArrayList&lt;Object&gt; objects = new ArrayList&lt;&gt;(count);
+        for (int i = 0; i &lt; count; i++) {
+            objects.add(new Object());
+        }
+
+        long allocatedBytes = threadMXBean.getThreadAllocatedBytes(threadId) - initialValue;
+        System.out.println("Object allocation test completed: " + objects.hashCode());
+        System.out.println("Thread allocated " + allocatedBytes + " bytes");
+    }
+}
+</code></pre>
+
+<p>The application creates millions of object instances and calculates the total memory allocated during their creation.
+The application reports the total allocated bytes, which include both the memory for <code>ArrayList</code> and the individual objects.</p>
+
+<p>Running this application on a machine with 16 GB of RAM and <strong>Oracle GraalVM for JDK 23</strong>, produces the following results.</p>
+
+<h4 id="native-image-with-compressed-references-and-default-serial-gc">Native Image with compressed references and default Serial GC:</h4>
+<pre><code>Object allocation test completed: -718496536
+Thread allocated 150995032 bytes
+</code></pre>
+<p>Breaking this down translates to:</p>
+<pre><code>48 MB for the ArrayList
+96 MB for the Objects (12 * 1024 * 1024 objects × 8 bytes)
+----------------------------------------------------------
+Total: 144 MB
+</code></pre>
+
+<h4 id="hotspot-with-compressed-references-and-default-g1-gc">HotSpot with compressed references and default G1 GC:</h4>
+<pre><code>Object allocation test completed: -1131298887
+Thread allocated 251658592 bytes
+</code></pre>
+
+<p>Breaking this down translates to:</p>
+<pre><code>48 MB for the ArrayList
+192 MB for the Objects (12 * 1024 * 1024 objects × 16 bytes)
+------------------------------------------------------------
+Total: 240 MB
+</code></pre>
+
+<p>The primary difference lies in the object header size (4-byte header vs 12-byte header).
+Note that the memory footprint for the <code>ArrayList</code> is roughly identical in both VMs.
+However, the memory for the millions of individual objects diverges due to the larger object headers on HotSpot.</p>
+
+<p>To summarize, when it comes to applications dealing with large numbers of small objects, Native Image may offer a smaller memory footprint.
+For Native Image, the object header size primarily depends on the used GC, the allocated instance type, and the state of compressed references.</p>
+
+<h3 id="further-reading">Further Reading</h3>
+
+<ul>
+  <li><a href="/reference-manual/native-image/optimizations-and-performance/MemoryManagement/">Memory Management</a></li>
+</ul>
+
+      </div>
+  </div>
+</div>
+      </main>
+      <footer class="footer footer__mobile">
+  <div class="container-fluid container-fluid--custom-sm">
+    <div class="row footer-content">
+      <div class="footer__columns">
+        <div class="footer__columns-item">
+          <h6 class="title-footer">API Documentation</h6>
+          <div class="grow">
+            <ul class="footer-list">
+              <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
+              <li class="footer-list__item"><a href="https://www.graalvm.org/truffle/javadoc/">GraalVM Truffle Javadoc</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer__columns-item">
+          <h6 class="title-footer">Learn More</h6>
+          <div class="grow">
+            <ul class="footer-list">
+              <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
+              <li class="footer-list__item"><a href="https://www.graalvm.org/release-notes/" target="_blank">Release notes</a></li>
+              <li class="footer-list__item"><a href="https://github.com/graalvm/graalvm-demos/"
+                  target="_blank">Demos</a></li>
+              <li class="footer-list__item"><a href="https://medium.com/graalvm" target="_blank">Blog</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="row">
+        <div class="col-sm-12">
+          <p class="copyright">
+            Copyright © 2024, Oracle and/or its affiliates. All rights reserved. Oracle and Java are registered trademarks. Other names may be trademarks of their respective owners.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+
+    <div class="overlay"></div>
+
+    <script src='/resources/js/main.js'></script>
+  </body>
+
+</html>

@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,10 +77,10 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="visualvm">VisualVM</h1>
 
-<p>GraalVM provides support for <a href="https://visualvm.github.io">VisualVM</a>, the all-in-one Java (and polyglot) monitoring and troubleshooting tool. VisualVM enables powerful yet easy-to-use Java tooling which includes heap analysis for the supported guest languages. The following languages and features are currently available:</p>
+<p>GraalVM provides support for <a href="https://visualvm.github.io">VisualVM</a>, the all-in-one Java (and polyglot) monitoring and troubleshooting tool. 
+VisualVM enables powerful yet easy-to-use Java tooling which includes heap analysis for the supported guest languages. The following languages and features are currently available:</p>
 
 <ul>
   <li><strong>Java:</strong> Heap Summary, Objects View, Threads View, OQL Console</li>
@@ -71,27 +92,31 @@
 
 <h3 id="starting-visualvm">Starting VisualVM</h3>
 
-<p>VisualVM is shipped as an installable component and can be added to GraalVM using <a href="/reference-manual/graalvm-updater/">GraalVM Updater</a>:</p>
+<ol>
+  <li>
+    <p>Download the latest VisualVM from <a href="http://visualvm.github.io/">visualvm.github.io</a>, unzip, and move it to the applications directory.</p>
+  </li>
+  <li>
+    <p>Double-click on the application icon to start.</p>
+  </li>
+</ol>
 
-<pre><code class="language-shell">gu install visualvm
-</code></pre>
-
-<p>This installs VisualVM in the <code>$JAVA_HOME/bin</code> directory.
-To start VisualVM, execute <code>jvisualvm</code>:</p>
-
-<pre><code class="language-shell">$JAVA_HOME/bin/jvisualvm
-</code></pre>
 <p>Immediately after startup, the tool shows all locally running Java processes in the Applications area, including the VisualVM process, itself.</p>
 
-<h3 id="capture-a-heap-dump">Capture a Heap Dump</h3>
-<p>To capture a heap dump of, for example, a Ruby application for later analysis, start your application and let it run for a few seconds to warm up.
-Then right-click its process in VisualVM and invoke the Heap Dump action.
-A new heap viewer for the Ruby process opens.</p>
+<h3 id="using-visualvm-with-graalvm-native-executables">Using VisualVM with GraalVM Native Executables</h3>
 
-<p><strong>Note:</strong> Heap dump support must be explicitly enabled when using <a href="/reference-manual/native-image/">Native Image</a>.
-Add the <code>--enable-monitoring=heapdump,jvmstat</code> option when invoking the <code>native-image</code> tool to enable the heap dump feature and allow VisualVM to detect native executables via <code>jvmstat</code>.
-This way your application will handle signals and capture a heap dump when it receives the <code>SIGUSR1</code> signal.
-See the <a href="/reference-manual/native-image/guides/create-heap-dump/">Generating Native Heap Dumps</a> page for details on capturing heap dumps from a native image process.</p>
+<blockquote>
+  <p>Note: VisualVM support for GraalVM native executables is not yet available on Windows.</p>
+</blockquote>
+
+<p>When using GraalVM <a href="/reference-manual/native-image/">Native Image</a>, VisualVM support is disabled by default.
+VisualVM support can be enabled when building a native executable with the option <code>--enable-monitoring=jvmstat,heapdump</code>:</p>
+<pre><code class="language-shell">native-image --enable-monitoring=jvmstat,heapdump JavaApplication
+</code></pre>
+
+<h3 id="capture-a-heap-dump">Capture a Heap Dump</h3>
+<p>To capture a heap dump for later analysis, start your application and let it run for a few seconds to warm up.
+Then right-click its process in VisualVM and invoke the Heap Dump action.</p>
 
 <h3 id="analyzing-objects">Analyzing Objects</h3>
 <p>Initially the Summary view for the Java heap is displayed.
@@ -102,25 +127,25 @@ Now the heap viewer displays all Ruby heap objects, aggregated by their type.</p
 Each object displays its logical value as provided by the underlying implementation.
 Expand the objects to access their variables and references, where available.</p>
 
-<p><img src="/docs/tools/img/HeapViewer_objects.png" alt="" /></p>
+<p><img src="/docs/tools/img/HeapViewer_objects.png" alt="VisualVM: Heap Viewer Objects" /></p>
 
 <p>Now enable the Preview, Variables, and References details by clicking the buttons in the toolbar, and select the individual <em>ProcType</em> objects.
 Where available, the Preview view shows the corresponding source fragment, the Variables view shows variables of the object, and the References view shows objects referring to the selected object.</p>
 
-<p>Last, use the Presets dropdown in the Heap Viewer toolbar to switch the view from All Objects to Dominators or GC Roots.
+<p>Last, use the Presets drop down list in the Heap Viewer toolbar to switch the view from All Objects to Dominators or GC Roots.
 To display the heap dominators, retained sizes must be computed first, which can take a few minutes for the <em>server.rb</em> example.
 Select the Objects aggregation in the toolbar to view the individual dominators or GC roots.</p>
 
-<p><img src="/docs/tools/img/HeapViewer_objects_dominators.png" alt="" /></p>
+<p><img src="/docs/tools/img/HeapViewer_objects_dominators.png" alt="VisualVM: Heap Viewer Objects Dominators" /></p>
 
 <h3 id="analyzing-threads">Analyzing Threads</h3>
-<p>Click the leftmost dropdown in the Heap Viewer toolbar and select the Threads view for the Ruby heap.
+<p>Click the leftmost drop down list in the Heap Viewer toolbar and select the Threads view for the Ruby heap.
 The heap viewer now displays the Ruby thread stack trace, including local objects. The stack trace can alternatively be displayed textually by clicking the HTML toolbar button.</p>
 
-<p><img src="/docs/tools/img/HeapViewer_thread.png" alt="" /></p>
+<p><img src="/docs/tools/img/HeapViewer_thread.png" alt="VisualVM: Heap Viewer Thread" /></p>
 
 <h3 id="reading-jfr-snapshots">Reading JFR Snapshots</h3>
-<p>The VisualVM tool bundled with GraalVM 19.2.x and later has the ability to read JFR snapshots – snapshots taken with JDK Flight Recorder (previously Java Flight Recorder).
+<p>The VisualVM tool bundled with GraalVM 19.2.x and later has the ability to read JFR snapshots—snapshots taken with JDK Flight Recorder (previously Java Flight Recorder).
 JFR is a tool for collecting diagnostic and profiling data about a running Java application.
 It is integrated into the Java Virtual Machine (JVM) and causes almost no performance overhead, so it can be used even in heavily loaded production environments.</p>
 
@@ -137,12 +162,12 @@ Please follow the documentation for your Java version to create JFR snapshots.</
 
 <p>The JFR viewer reads all JFR snapshots created from Java 7 onward, and presents the data in typical VisualVM views familiar to the tool users.</p>
 
-<p><img src="/docs/tools/img/visualvm_jfr.png" alt="" /></p>
+<p><img src="/docs/tools/img/visualvm_jfr.png" alt="VisualVM: Viewing JFR via VisualVM" /></p>
 
 <p>These views and functionality tabs are currently available:</p>
 
 <ul>
-  <li>Overview tab - displays the basic information about the recorded process like
+  <li>Overview tab - displays the basic information about the recorded process such as
 its main class, arguments, JVM version and configuration, and system properties.
 This tab also provides access to the recorded thread dumps.</li>
   <li>Monitor tab - shows the process uptime and basic telemetry: CPU usage, Heap
@@ -160,13 +185,13 @@ analysis but still helps to understand what was going on in the recorded
 application, and where the CPU bottleneck might be.</li>
   <li>Browser tab - provides a generic browser of all events recorded in the snapshot.</li>
   <li>Environment tab - gives an overview of the recording machine setup and conditions
-like CPU model, memory size, operating system version, CPU utilization, memory
-usage, etc.</li>
-  <li>Recording tab - lists the recording settings and basic snapshot telemetry like
+such as CPU model, memory size, operating system version, CPU utilization, memory
+usage, and so on.</li>
+  <li>Recording tab - lists the recording settings and basic snapshot telemetry such as
 number of events, total recording time, etc.</li>
 </ul>
 
-<p>Note: The support of JDK Flight Recorder is currently experimental. Some advanced features like analyzing JVM internals, showing event stack traces, or support for creating JFR snapshots from live processes are not available in this preview version and will be addressed incrementally in the following releases.</p>
+<p>Note: The support of JDK Flight Recorder is currently experimental. Some advanced features such as analyzing JVM internals, showing event stack traces, or support for creating JFR snapshots from live processes are not available in this preview version and will be addressed incrementally in the following releases.</p>
 
       </div>
   </div>
@@ -177,7 +202,7 @@ number of events, total recording time, etc.</li>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -186,7 +211,7 @@ number of events, total recording time, etc.</li>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -210,19 +235,6 @@ number of events, total recording time, etc.</li>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

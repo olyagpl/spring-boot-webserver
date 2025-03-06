@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,7 +77,6 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="introduction-to-simplelanguage">Introduction to SimpleLanguage</h1>
 
 <p>To implement your own language, get started by extending an existing language such as SimpleLanguage.
@@ -81,21 +101,21 @@ It aims to use most of the available <a href="/graalvm-as-a-platform/language-im
     <pre><code class="language-shell"> git clone https://github.com/graalvm/simplelanguage
 </code></pre>
   </li>
-  <li>Execute <code>./mvnw package</code> from the SimpleLanguage folder to build the language. Before that, verify that <code>native-image</code> is available with your GraalVM installation to avoid a build failure:
+  <li>Execute <code>mvn package</code> from the SimpleLanguage directory to build the language. Before that, verify that <code>native-image</code> is available with your GraalVM installation to avoid a build failure:
     <pre><code class="language-shell"> cd simplelanguage
 </code></pre>
     <pre><code class="language-shell"> native-image --version
 </code></pre>
-    <pre><code class="language-shell"> ./mvnw package
+    <pre><code class="language-shell"> mvn package
 </code></pre>
-    <p>The command builds the <code>slnative</code> executable in the <code>simplelanguage/native</code> directory and the <code>sl-component.jar</code> language component which can be later installed into GraalVM using the <a href="/reference-manual/graalvm-updater/">GraalVM Updater</a> tool.</p>
+    <p>The command builds the <code>slnative</code> executable in the <code>simplelanguage/native</code> directory and the <code>sl-component.jar</code> language component.</p>
 
     <p>You can disable the SimpleLanguage native executable build during the packaging phase by running:</p>
     <pre><code class="language-shell"> export SL_BUILD_NATIVE=false
- ./mvnw package
+ mvn package
 </code></pre>
   </li>
-  <li>Run SimpleLanguage from the project root folder:
+  <li>Run SimpleLanguage from the project root directory:
     <pre><code class="language-shell"> ./sl language/tests/HelloWorld.sl
 </code></pre>
   </li>
@@ -112,20 +132,20 @@ If you would like to experiment with your language and get the benefits of an ID
 
 <h3 id="eclipse">Eclipse</h3>
 
-<p>The SimpleLanguage teaching project has been tested with Eclipse Neon.2 Release 4.6.2, and Eclipse Oxygen.3A. To import the project folder to the desirable Eclipse environment:</p>
+<p>The SimpleLanguage teaching project has been tested with Eclipse Neon.2 Release 4.6.2, and Eclipse Oxygen.3A. To import the project directory to the desirable Eclipse environment:</p>
 <ol>
   <li>Open Eclipse with a new workspace.</li>
   <li>Install the <code>m2e</code> and <code>m2e-apt</code> plugins from the Eclipse marketplace (Help -&gt; Eclipse Marketplace).</li>
-  <li>Finally, import the <code>SimpleLanguage</code> project from File -&gt; Import -&gt; Maven -&gt; Existing Maven Projects -&gt; browse to the SimpleLanguage folder -&gt; Finish.</li>
+  <li>Finally, import the <code>SimpleLanguage</code> project from File -&gt; Import -&gt; Maven -&gt; Existing Maven Projects -&gt; browse to the SimpleLanguage directory -&gt; Finish.</li>
 </ol>
 
 <h3 id="netbeans">NetBeans</h3>
 
-<p>NetBeans provides GUI support for debugging arbitrary languages. To upload SimpleLanguage to NetBeans interface, go to File -&gt; Open Project -&gt; select <code>simplelanguage</code> folder -&gt; check Open Required Projects -&gt; open Project.</p>
+<p>NetBeans provides GUI support for debugging arbitrary languages. To upload SimpleLanguage to NetBeans interface, go to File -&gt; Open Project -&gt; select <code>simplelanguage</code> directory -&gt; check Open Required Projects -&gt; open Project.</p>
 
 <h3 id="intellij-idea">IntelliJ IDEA</h3>
 
-<p>The SimpleLanguage project was tested with IntelliJ IDEA. Open IntelliJ IDEA and, from the main menu bar, select  File -&gt; Open -&gt; Navigate to and select the <code>simplelanguage</code> folder -&gt; Press OK. All dependencies will be included automatically.</p>
+<p>The SimpleLanguage project was tested with IntelliJ IDEA. Open IntelliJ IDEA and, from the main menu bar, select  File -&gt; Open -&gt; Navigate to and select the <code>simplelanguage</code> directory -&gt; Press OK. All dependencies will be included automatically.</p>
 
 <h2 id="dump-graphs">Dump Graphs</h2>
 
@@ -157,7 +177,7 @@ IGV is developed to view and inspect intermediate representation graphs – a la
     <pre><code class="language-shell"> mx -p graal/compiler igv
 </code></pre>
   </li>
-  <li>Execute the following from the SimpleLanguage root folder to dump graphs to IGV:
+  <li>Execute the following from the SimpleLanguage root directory to dump graphs to IGV:
     <pre><code class="language-shell"> ./sl -dump language/tests/SumPrint.sl
 </code></pre>
   </li>
@@ -174,12 +194,12 @@ Learn more <a href="/tools/igv/">here</a>.</p>
 <pre><code class="language-shell">./sl -debug language/tests/HelloWorld.sl
 </code></pre>
 
-<p>Then attach a Java remote debugger (like Eclipse) on port 8000.</p>
+<p>Then attach a Java remote debugger (such as Eclipse) on port 8000.</p>
 
 <h2 id="simplelanguage-component-for-graalvm">SimpleLanguage Component for GraalVM</h2>
 
 <p>Languages implemented with the <a href="https://github.com/oracle/graal/tree/master/truffle">Truffle framework</a> can be packaged as <em>components</em> which later can be installed into GraalVM using the <a href="/reference-manual/graalvm-updater/">GraalVM Updater</a> tool.
-Running <code>./mvnw package</code> in the SimpleLanguage folder also builds a <code>sl-component.jar</code>.
+Running <code>mvn package</code> in the SimpleLanguage directory also builds a <code>sl-component.jar</code>.
 This file is the SimpleLanguage component for GraalVM and can be installed by running:</p>
 <pre><code class="language-shell">gu -L install /path/to/sl-component.jar
 </code></pre>
@@ -187,7 +207,7 @@ This file is the SimpleLanguage component for GraalVM and can be installed by ru
 <h2 id="simplelanguage-native-image">SimpleLanguage Native Image</h2>
 
 <p>A language built with Truffle can be AOT compiled using <a href="/reference-manual/native-image/">Native Image</a>.
-Running <code>./mvnw package</code> in the SimpleLanguage folder also builds a <code>slnative</code> executable in the <code>native</code> directory.
+Running <code>mvn package</code> in the SimpleLanguage directory also builds a <code>slnative</code> executable in the <code>native</code> directory.
 This executable is the full SimpleLanguage implementation as a single native application, and has no need for GraalVM in order to execute SimpleLanguage code.
 Besides this, a big advantage of using the native executable when compared to running on GraalVM is the greatly faster startup time as shown bellow:</p>
 <pre><code class="language-shell">time ./sl language/tests/HelloWorld.sl
@@ -221,7 +241,7 @@ When using the native executable we see that the execution takes only 4ms, showi
 Since the native executable build can take a bit of time, we provide the option to skip this build by setting the <code>SL_BUILD_NATIVE</code> environment variable to <code>false</code> like so:</p>
 
 <pre><code class="language-shell">export SL_BUILD_NATIVE=false
-./mvnw package
+mvn package
 ...
 [INFO]
 [INFO] ------------------------------------------------------------------------
@@ -236,7 +256,7 @@ Skipping the native image build because SL_BUILD_NATIVE is set to false.
 ...
 </code></pre>
 
-<h2 id="run-simplelanguage-with-the-newest-developement-version-of-the-compiler">Run SimpleLanguage with the Newest (Developement) version of the Compiler</h2>
+<h2 id="run-simplelanguage-with-the-newest-development-version-of-the-compiler">Run SimpleLanguage with the Newest (Development) version of the Compiler</h2>
 
 <p>To run SimpleLanguage with the development version of the Graal compiler we must build a GraalVM with that compiler.
 Clone the <code>graal</code> repository (https://github.com/oracle/graal) and follow the instructions in the <code>vm/README.md</code> file to build a GraalVM.</p>
@@ -258,7 +278,7 @@ The following subsections describe the command line for both cases.</p>
     com.oracle.truffle.sl.launcher.SLMain language/tests/Add.sl
 </code></pre>
 
-<p>In short, we place the launcher JAR on the class path and execute its main class, but we inform GraalVM of the presence of SimpleLanguage by using the <code>-Dtruffle.class.path.append</code> option and providing it the path to the fat language JAR.
+<p>In short, we place the launcher JAR file on the class path and execute its main class, but we inform GraalVM of the presence of SimpleLanguage by using the <code>-Dtruffle.class.path.append</code> option and providing it the path to the fat language JAR file.
 Having the language on a separate class path ensures a strong separation between the language implementation and its embedding context (in this case, the launcher).</p>
 
 <h4 id="disable-class-path-separation">Disable Class Path Separation</h4>
@@ -268,8 +288,8 @@ Having the language on a separate class path ensures a strong separation between
 <p>For development purposes it is useful to disable the class path separation and enable having the language implementation on the application class path (for example, for testing
 the internals of the language).</p>
 
-<p>The Language API JAR on Maven Central exports all API packages in its module-info.
-Apply the <code>--upgrade-module-path</code> option together with <code>-Dgraalvm.locatorDisabled=true</code> and this JAR to export Language API packages:</p>
+<p>The Language API JAR file on Maven Central exports all API packages in its module-info.
+Apply the <code>--upgrade-module-path</code> option together with <code>-Dgraalvm.locatorDisabled=true</code> and this JAR file to export Language API packages:</p>
 <pre><code class="language-shell">-Dgraalvm.locatorDisabled=true --module-path=&lt;yourModulePath&gt;:${truffle.dir} --upgrade-module-path=${truffle.dir}/truffle-api.jar
 </code></pre>
 
@@ -277,15 +297,15 @@ Apply the <code>--upgrade-module-path</code> option together with <code>-Dgraalv
 
 <blockquote>
   <p>Note: Disabling the locator effectively removes all installed languages from the module path as the locator also creates the class loader for the languages.
-To still use the builtin languages add them to the module-path by pointing the module-path to all needed language homes (for example, <code>$GRAALVM/languages/js</code>).</p>
+To still use the built-in languages, add them to the module path by updating the module path to include the paths of all the languages you need (for example, <code>$GRAALVM/languages/js</code>).</p>
 </blockquote>
 
 <h3 id="other-jvm-implementations">Other JVM Implementations</h3>
 
-<p>Unlike GraalVM, which includes all the dependencies needed to run a language implemented with <a href="/graalvm-as-a-platform/language-implementation-framework/">Truffle</a>, other JVM implementations need additional JARs to be present on the class path.
-These are the Language API and GraalVM SDK JARs available from Maven Central.</p>
+<p>Unlike GraalVM, which includes all the dependencies needed to run a language implemented with <a href="/graalvm-as-a-platform/language-implementation-framework/">Truffle</a>, other JVM implementations need additional JAR files to be present on the class path.
+These are the Language API and GraalVM SDK JAR files available from Maven Central.</p>
 
-<p>Assuming <code>JAVA_HOME</code> points to a stock JDK installation, and that the current working directory is the <code>simplelanguage</code> directory and the Language API and GraalVM SDK JARs are present in that directory, one can execute SimpleLanguage with the following command:</p>
+<p>Assuming <code>JAVA_HOME</code> points to a stock JDK installation, and that the current working directory is the <code>simplelanguage</code> directory and the Language API and GraalVM SDK JAR files are present in that directory, one can execute SimpleLanguage with the following command:</p>
 
 <pre><code class="language-shell">$JAVA_HOME/bin/java \
     -cp graal-sdk-22.1.0.jar:truffle-api-22.1.0.jar:launcher/target/launcher-22.1.0-SNAPSHOT.jar:language/target/simplelanguage.jar \
@@ -301,7 +321,7 @@ These are the Language API and GraalVM SDK JARs available from Maven Central.</p
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -310,7 +330,7 @@ These are the Language API and GraalVM SDK JARs available from Maven Central.</p
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -334,19 +354,6 @@ These are the Language API and GraalVM SDK JARs available from Maven Central.</p
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

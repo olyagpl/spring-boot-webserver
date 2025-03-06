@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -89,13 +110,12 @@ However this is complicated, so normally the Truffle framework uses the GraalVM 
 
 <p>GraalVM is the platform on which TruffleRuby runs. It is a system for high-performance polyglot programming.</p>
 
-<p>More concretely, GraalVM is a modified version of the OracleJDK that includes the Truffle framework, the GraalVM compiler, TruffleRuby, and other languages supported by GraalVM including JavaScript, Python, and R.</p>
-
-<p>See how to <a href="/reference-manual/ruby/InstallingGraalVM/">install GraalVM and TruffleRuby</a>.</p>
+<p>More concretely, GraalVM is a JDK (Java Development Kit) with extra components like the GraalVM compiler and GraalVM Native Image.
+The GraalVM compiler and GraalVM Native Image are then used by Truffle languages like TruffleRuby.</p>
 
 <h3 id="how-do-i-get-truffleruby">How do I get TruffleRuby?</h3>
 
-<p>There are three ways to get TruffleRuby. Please see <a href="/reference-manual/ruby/#system-compatibility">Getting Started</a>.</p>
+<p>There are multiple ways to install TruffleRuby, see <a href="/reference-manual/ruby/#getting-started">Getting Started</a>.</p>
 
 <h3 id="why-is-truffleruby-slow-on-a-standard-jvm">Why is TruffleRuby slow on a standard JVM?</h3>
 
@@ -125,17 +145,24 @@ In 2017 the code was forked back out of JRuby after it had matured.</p>
 
 <h3 id="how-do-i-know-if-im-using-a-vm-that-has-the-graalvm-compiler">How do I know if I’m using a VM that has the GraalVM compiler?</h3>
 
-<p><code>ruby --version</code> will report <code>GraalVM CE</code> or <code>EE</code>.</p>
+<p><code>ruby --version</code> will report <code>GraalVM CE</code> or <code>Oracle GraalVM</code>.
+TruffleRuby versions before 23.0 report <code>GraalVM EE</code> instead of <code>Oracle GraalVM</code>.</p>
 
 <p>Also, <code>TruffleRuby.jit?</code> will tell you if you are running with the GraalVM compiler.</p>
+
+<h3 id="what-is-oracle-graalvm">What is Oracle GraalVM?</h3>
+
+<p>Oracle GraalVM is the GraalVM distribution from Oracle available under the <a href="https://medium.com/graalvm/161527df3d76">GraalVM Free Terms and Conditions</a>.
+Oracle GraalVM provides the best TruffleRuby experience: it is significantly faster and more memory-efficient than GraalVM Community Edition.</p>
 
 <h3 id="how-do-i-know-that-im-using-the-community-edition-of-graalvm">How do I know that I’m using the Community Edition of GraalVM?</h3>
 
 <p><code>ruby --version</code> will report <code>GraalVM CE</code>.</p>
 
-<h3 id="how-do-i-know-that-im-using-the-enterprise-edition-of-graalvm">How do I know that I’m using the Enterprise Edition of GraalVM?</h3>
+<h3 id="how-do-i-know-that-im-using-oracle-graalvm">How do I know that I’m using Oracle GraalVM?</h3>
 
-<p><code>ruby --version</code> will report <code>GraalVM EE</code>.</p>
+<p><code>ruby --version</code> will report <code>Oracle GraalVM</code>.
+TruffleRuby versions before 23.0 report <code>GraalVM EE</code> instead.</p>
 
 <h3 id="how-do-i-know-that-im-using-the-native-version-of-truffleruby">How do I know that I’m using the native version of TruffleRuby?</h3>
 
@@ -166,7 +193,7 @@ end
 Currently we’ve added specialization for the code paths in the benchmarks and applications that we’ve been using.
 Adding them is generally not complicated and over time we will have specializations to cover a broad range of applications.</p>
 
-<p>Make sure that you are using the <a href="/reference-manual/ruby/InstallingGraalVM/">Enterprise Edition of GraalVM, and have rebuilt the executable images</a> for the best performance.</p>
+<p>Make sure that you are using <a href="/reference-manual/ruby/InstallingTruffleRuby/#oracle-graalvm-and-graalvm-community-edition">Oracle GraalVM</a> for the best performance.</p>
 
 <h3 id="how-is-this-related-to-invokedynamic">How is this related to <code>invokedynamic</code>?</h3>
 
@@ -196,7 +223,7 @@ Forking also allowed us to simplify our code base.</p>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -205,7 +232,7 @@ Forking also allowed us to simplify our code base.</p>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -229,19 +256,6 @@ Forking also allowed us to simplify our code base.</p>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -82,6 +103,69 @@ by anything, and how TruffleRuby has mitigated. We have not investigated all leg
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td>CVE-2024-49761</td>
+      <td>ReDoS vulnerability in REXML</td>
+      <td><a href="https://github.com/ruby/rexml/commit/ce59f2eb1aeb371fe1643414f06618dbe031979f">Fix</a></td>
+      <td><a href="https://github.com/ruby/rexml/commit/ce59f2eb1aeb371fe1643414f06618dbe031979f">Test</a></td>
+      <td>Not applicable thanks to TRegex</td>
+    </tr>
+    <tr>
+      <td>CVE-2024-39908</td>
+      <td>DoS in REXML</td>
+      <td><a href="https://github.com/ruby/rexml/compare/v3.3.1...v3.3.2">Fix</a></td>
+      <td><a href="https://github.com/ruby/rexml/compare/v3.3.1...v3.3.2">Test</a></td>
+      <td><a href="https://www.ruby-lang.org/en/news/2024/07/16/dos-rexml-cve-2024-39908/">same mitigation as CRuby</a>, users must update rexml to 3.3.2+ if they use it</td>
+    </tr>
+    <tr>
+      <td>CVE-2024-35176</td>
+      <td>DoS in REXML</td>
+      <td><a href="https://github.com/ruby/rexml/pull/126/commits/ba70cfefadf7e79885fe08228d1df4c0549ad0f8">Fix</a></td>
+      <td><a href="https://github.com/ruby/rexml/pull/126/commits/ba70cfefadf7e79885fe08228d1df4c0549ad0f8">Test</a></td>
+      <td><a href="https://www.ruby-lang.org/en/news/2024/05/16/dos-rexml-cve-2024-35176/">same mitigation as CRuby</a>, users must update rexml to 3.2.7+ if they use it</td>
+    </tr>
+    <tr>
+      <td>CVE-2024-27282</td>
+      <td>Arbitrary memory address read vulnerability with Regex search</td>
+      <td><a href="https://github.com/ruby/ruby/commit/989a2355808a63fc45367785c82ffd46d18c900a">Fix</a></td>
+      <td> </td>
+      <td>Not applicable thanks to Java semantics</td>
+    </tr>
+    <tr>
+      <td>CVE-2024-27281</td>
+      <td>RCE vulnerability with .rdoc_options in RDoc</td>
+      <td><a href="https://github.com/ruby/rdoc/compare/v6.3.3...v6.3.4.1">Fix</a></td>
+      <td> </td>
+      <td>Not applicable because TruffleRuby does not generate rdoc on gem install</td>
+    </tr>
+    <tr>
+      <td>CVE-2024-27280</td>
+      <td>Buffer overread vulnerability in StringIO</td>
+      <td><a href="https://github.com/ruby/stringio/compare/v3.0.1...v3.0.1.1">Fix</a></td>
+      <td><a href="https://github.com/ruby/stringio/commit/c58c5f54f1eab99665ea6a161d29ff6a7490afc8">Test</a></td>
+      <td>Not applicable, we use the Ruby implementation of StringIO</td>
+    </tr>
+    <tr>
+      <td>CVE-2023-36617</td>
+      <td>ReDoS vulnerability in URI</td>
+      <td><a href="https://github.com/ruby/uri/compare/v0.12.1...v0.12.2">Fix</a></td>
+      <td><a href="https://github.com/ruby/uri/compare/v0.12.1...v0.12.2">Test</a></td>
+      <td>Not applicable thanks to TRegex</td>
+    </tr>
+    <tr>
+      <td>CVE-2023-28756</td>
+      <td>ReDoS vulnerability in Time</td>
+      <td><a href="https://github.com/ruby/time/compare/v0.2.1...v0.2.2">Fix</a></td>
+      <td><a href="https://github.com/ruby/time/commit/c9b92a6e21f432528bddf65fbd132db3487d07bf">Test</a></td>
+      <td>Not applicable thanks to TRegex</td>
+    </tr>
+    <tr>
+      <td>CVE-2023-28755</td>
+      <td>ReDoS vulnerability in URI</td>
+      <td><a href="https://github.com/ruby/uri/compare/v0.12.0...v0.12.1">Fix</a></td>
+      <td><a href="https://github.com/ruby/uri/commit/d829f16559b9b61478dea024d72a2d615f67942f">Test</a></td>
+      <td>Not applicable thanks to TRegex</td>
+    </tr>
     <tr>
       <td>CVE-2021-33621</td>
       <td>HTTP response splitting in CGI</td>
@@ -151,6 +235,20 @@ by anything, and how TruffleRuby has mitigated. We have not investigated all leg
       <td>Sanitization of paths in tmpdir.rb</td>
       <td>In <code>test/mri/tests/test_tmpdir.rb</code></td>
       <td>Sanitization of paths in tmpdir.rb</td>
+    </tr>
+    <tr>
+      <td>CVE-2020-25613</td>
+      <td>Potential HTTP Request Smuggling Vulnerability in WEBrick</td>
+      <td><a href="https://github.com/ruby/webrick/commit/076ac636bf48b7a492887ce4de7041de23e6c00d">Fix</a></td>
+      <td> </td>
+      <td>WEBrick no longer shipped in stdlib</td>
+    </tr>
+    <tr>
+      <td>CVE-2020-10933</td>
+      <td>Heap exposure vulnerability in the socket library</td>
+      <td><a href="https://github.com/ruby/ruby/commit/61b7f86248bd121be2e83768be71ef289e8e5b90">Fix</a></td>
+      <td> </td>
+      <td>Not applicable thanks to Java semantics</td>
     </tr>
     <tr>
       <td>CVE-2021-28965</td>
@@ -248,6 +346,13 @@ by anything, and how TruffleRuby has mitigated. We have not investigated all leg
       <td>Escape sequence injection in errors</td>
       <td>Sanitise error messages</td>
       <td>Tested in <code>ruby/spec</code> <code>:security</code></td>
+      <td>Applied the same patch</td>
+    </tr>
+    <tr>
+      <td>None</td>
+      <td>Multiple vulnerabilities in RubyGems</td>
+      <td> </td>
+      <td> </td>
       <td>Applied the same patch</td>
     </tr>
     <tr>
@@ -739,7 +844,7 @@ For hashing strings, TruffleRuby uses Java’s hash algorithm (and then <code>Mu
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -748,7 +853,7 @@ For hashing strings, TruffleRuby uses Java’s hash algorithm (and then <code>Mu
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -772,19 +877,6 @@ For hashing strings, TruffleRuby uses Java’s hash algorithm (and then <code>Mu
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

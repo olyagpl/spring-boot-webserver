@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:image" content='/resources/img/graalvm.png' />
+  <meta name="twitter:widgets:border-color" content="#55acee">
+
+  <title>
+    
+      GraalVM
+    
+  </title>
+  <meta name="description" content="GraalVM is an advanced JDK with ahead-of-time Native Image compilation."/>
+
+  <link rel="icon" id="favicon" href='/resources/img/favicon/favicon-light/favicon-light.ico'>
+
+  <link rel="manifest" href='/resources/img/favicon/site.webmanifest'>
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+
+  <script src='/resources/lib/jquery/jquery-3.6.1.min.js'></script>
+  <link rel="stylesheet" href='/assets/main.css'>
+  <script src='/resources/lib/bootstrap/js/bootstrap.min.js'></script>
+  <script src='/resources/lib/highlight/highlight.pack.js'></script>
+  <script src='/resources/lib/purl/purl.js'></script>
+  <script src='/resources/lib/fiddle/fiddle.js' defer></script>
+  <link rel="stylesheet" href='/resources/styles/fiddle.css'>
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+</head>
+
+  <body class="preload">
+
+    <div>
+      <header  class="header header--content"  role="banner">
+
+  
+
+  <div class="container-fluid container-fluid--custom-sm">
+    <div class="row">
+      <div class="col-12 col-sm-12 col-md-12 col-lg-10">
+        <div class="d-flex">
+          <a href="https://www.graalvm.org/">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
+          </a>  
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+</header>
+      <main class="content content--home wrapper" aria-label="Content">
+        <div class="container-fluid container-fluid--custom-sm">
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
+      <br>
+      <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
+      <h1 id="software-bill-of-materials-sbom-in-native-image">Software Bill of Materials (SBOM) in Native Image</h1>
+
+<p>GraalVM Native Image can assemble a Software Bill of Materials (SBOM) at build time to detect any libraries that may be susceptible to known security vulnerabilities.
+Native Image provides the <code>--enable-sbom</code> option to embed an SBOM into a native executable (only available in Oracle GraalVM).
+In addition to being embedded, the SBOM can be added to the classpath or exported as a JSON file by using <code>--enable-sbom=classpath,export</code>.</p>
+
+<p>The CycloneDX format is supported and is the default.
+To embed a CycloneDX SBOM into a native executable, pass the <code>--enable-sbom</code> option to the <code>native-image</code> command.</p>
+
+<p>The implementation constructs the SBOM by recovering all version information observable in external library manifests for classes included in a native executable.
+The SBOM is compressed to limit the SBOM’s impact on the native executable size.
+The SBOM is stored in the <code>gzip</code> format with the exported <code>sbom</code> symbol referencing its start address and the <code>sbom_length</code> symbol referencing its size.</p>
+
+<p>After embedding the compressed SBOM into the executable, the <a href="/reference-manual/native-image/debugging-and-diagnostics/InspectTool/">Native Image Inspect Tool</a> is able to extract the compressed SBOM using an optional <code>--sbom</code> parameter accessible through <code>$JAVA_HOME/bin/native-image-inspect --sbom &lt;path_to_binary&gt;</code> from both executables and shared libraries.
+It outputs the SBOM in the following format:</p>
+
+<pre><code class="language-json">{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "components": [
+    {
+      "bom-ref": "pkg:maven/io.netty/netty-codec-http2@4.1.104.Final",
+      "type": "library",
+      "group": "io.netty",
+      "name": "netty-codec-http2",
+      "version": "4.1.104.Final",
+      "purl": "pkg:maven/io.netty/netty-codec-http2@4.1.104.Final",
+      "properties": [
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:codec:codec:4.1.76.Final:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:codec:netty-codec-http2:4.1.76.Final:*:*:*:*:*:*:*"
+        },
+        {
+          "name": "syft:cpe23",
+          "value": "cpe:2.3:a:codec:netty_codec_http2:4.1.76.Final:*:*:*:*:*:*:*"
+        },
+        ...
+      ]
+    },
+    ...
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:maven/io.netty/netty-codec-http2@4.1.104.Final",
+      "dependsOn": [
+        "pkg:maven/io.netty/netty-buffer@4.1.104.Final",
+        "pkg:maven/io.netty/netty-codec-http@4.1.104.Final",
+        "pkg:maven/io.netty/netty-codec@4.1.104.Final",
+        "pkg:maven/io.netty/netty-common@4.1.104.Final",
+        "pkg:maven/io.netty/netty-transport@4.1.104.Final"
+      ]
+    },
+    ...
+  ],
+  "serialNumber": "urn:uuid:51ec305f-616e-4139-a033-a094bb94a17c"
+}
+</code></pre>
+
+<h2 id="vulnerability-scanning">Vulnerability Scanning</h2>
+
+<p>To scan for vulnerable libraries, use either the <a href="https://github.com/marketplace/actions/github-action-for-graalvm">GraalVM GitHub Action</a> for automated scanning, or submit the SBOM to a vulnerability scanner directly.</p>
+
+<h3 id="github-integration">GitHub Integration</h3>
+
+<p>When using the <a href="https://github.com/marketplace/actions/github-action-for-graalvm">GraalVM GitHub Action</a>, the SBOM can be automatically generated and submitted to GitHub’s dependency submission API for continuous scanning. 
+This enables:</p>
+<ul>
+  <li>Vulnerability tracking with GitHub’s Dependabot.</li>
+  <li>Dependency tracking with GitHub’s Dependency Graph.</li>
+</ul>
+
+<p>If you use GitHub, this integration offers you the simplest setup and powerful security tooling.</p>
+
+<h3 id="command-line-scanning">Command-Line Scanning</h3>
+
+<p>The popular <a href="https://anchore.com/">Anchore software supply chain management platform</a> makes the <code>grype</code> scanner available for free.
+You can check whether the libraries given in your SBOMs have known vulnerabilities documented in Anchore’s database.
+For this purpose, the output of the tool can be fed directly to the <code>grype</code> scanner to check for vulnerable libraries, using the command <code>$JAVA_HOME/bin/native-image-inspect --sbom &lt;path_to_binary&gt; | grype</code> which produces the following output:</p>
+<pre><code class="language-shell">NAME                 INSTALLED      VULNERABILITY   SEVERITY
+netty-codec-http2    4.1.76.Final   CVE-2022-24823  Medium
+</code></pre>
+
+<p>You can then use this report to update any vulnerable dependencies found in your executable.</p>
+
+<blockquote>
+  <p>Note: Running <code>native-image-inspect</code> without <code>--sbom</code> executes code from the native binary to extract class information. <strong>Do not use it on untrusted binaries.</strong> This extraction method is deprecated—use <a href="#including-class-level-metadata-in-the-sbom">class-level SBOMs</a> instead.</p>
+</blockquote>
+
+<h2 id="dependency-tree">Dependency Tree</h2>
+
+<p>The SBOM provides information about component relationships through its <code>dependencies</code> field.
+This dependency information is derived from Native Image’s static analysis call graph.
+Analyzing the dependency graph can help you understand why specific components are included in your application.
+For example, discovering an unexpected component in the SBOM allows for tracing its inclusion through the dependency graph to identify which parts of the application are using it.</p>
+
+<p>With the GraalVM GitHub Action, you get access to GitHub’s Dependency Graph feature.</p>
+
+<h2 id="more-accurate-sboms-with-maven">More Accurate SBOMs with Maven</h2>
+
+<p>To generate more accurate SBOMs, consider using the <a href="https://graalvm.github.io/native-build-tools/latest/maven-plugin.html">Maven plugin for GraalVM Native Image</a>.
+This plugin integrates with Native Image to improve the SBOM creation.</p>
+
+<p>The plugin creates a “baseline” SBOM by using the <code>cyclonedx-maven-plugin</code>.
+The baseline SBOM defines which package names belong to a component, helping Native Image associate classes with their respective components—a task that can be challenging for the <code>native-image</code> tool when shading or fat JARs are used.
+In this collaborative approach, Native Image is also able to prune components and dependencies more aggressively to produce a minimal SBOM.</p>
+
+<p>These enhancements are available starting with plugin version 0.10.4 and are enabled by default when the <code>--enable-sbom</code> option is used.</p>
+
+<h2 id="including-class-level-metadata-in-the-sbom">Including Class-Level Metadata in the SBOM</h2>
+
+<p>Using <code>--enable-sbom=class-level</code> adds class-level metadata to the SBOM components.
+This metadata includes Java modules, classes, interfaces, records, annotations, enums, constructors, fields, and methods that are part of the native executable.
+This information can be useful for:</p>
+<ul>
+  <li><strong>Advanced vulnerability scanning:</strong> When the affected classes or methods of a vulnerability are published as part of a CVE, the class-level metadata can be checked to determine if a native executable with the affected SBOM component is actually vulnerable, thereby reducing the false positive rate of vulnerability scanning.</li>
+  <li><strong>Understanding image contents:</strong> Quickly browse and search the class-level metadata to examine what is included in the native executable.</li>
+</ul>
+
+<blockquote>
+  <p>Including class-level metadata increases the SBOM size substantially. For this <a href="https://github.com/graalvm/graalvm-demos/tree/master/micronaut-hello-rest-maven">Micronaut Hello World Rest</a> application, the SBOM size is 1.1 MB when embedded, and 13.7 MB when exported. The SBOM without class-level metadata is 3.5 kB when embedded, and 64 kB when exported. The size of the native image without an embedded SBOM is around 52 MB.</p>
+</blockquote>
+
+<h3 id="data-format">Data Format</h3>
+
+<p>The <a href="https://cyclonedx.org/docs/1.5/json/">CycloneDX specification</a> allows the use of a hierarchical representation by nesting components that have a parent-child relationship.
+It is used to embed class-level information in SBOM components in the following way:</p>
+<pre><code>[component] SBOM Component
+└── [component] Java Modules
+    └── [component] Java Source Files
+        ├── [property] Classes
+        ├── [property] Interfaces
+        ├── [property] Records
+        ├── [property] Annotations
+        ├── [property] Enums
+        ├── [property] Fields
+        ├── [property] Constructors
+        └── [property] Methods
+</code></pre>
+<p>Each SBOM component lists its Java modules in the <code>components</code> field.
+Each module is identified by its name and lists its Java source files in the <code>components</code> field.
+Each source file is identified by its path relative to the component’s source directory and lists its classes, interfaces, records, annotations, enums, fields, constructors, and methods in the <code>properties</code> field.</p>
+
+<p>Consider an example of a simple component containing one Java source file in <code>mymodule</code>:</p>
+<pre><code class="language-java">// src/com/sbom/SBOMTestApplication.java
+package com.sbom;
+
+import org.apache.commons.validator.routines.RegexValidator;
+
+public class SBOMTestApplication {
+    private static final boolean IS_EMPTY_OR_BLANK = new RegexValidator("^[\\s]*$").isValid(" ");
+
+    public static void main(String[] argv) {
+        System.out.println(String.valueOf(IS_EMPTY_OR_BLANK));
+        ClassInSameFile someClass = new ClassInSameFile("hello ", "world");
+        someClass.doSomething();
+    }
+}
+
+class ClassInSameFile {
+    private final String value1;
+    private final String value2;
+
+    ClassInSameFile(String value1, String value2) {
+        this.value1 = value1;
+        this.value2 = value2;
+    }
+
+    String concatenate() {
+        System.out.println(value1 + value2);
+    }
+
+    // This method is unreachable and will therefore not be included in the SBOM
+    String unreachable() {
+        return value;
+    }
+}
+</code></pre>
+<p>The class-level SBOM component would look like this:</p>
+<pre><code class="language-json">{
+    "type": "library",
+    "group": "com.sbom",
+    "name": "sbom-test-app",
+    "version": "1.0.0",
+    "purl": "pkg:maven/com.sbom/sbom-test-app@1.0.0",
+    "bom-ref": "pkg:maven/com.sbom/sbom-test-app@1.0.0",
+    "properties": [...],
+    "components": [
+        {
+            "type": "library",
+            "name": "mymodule",
+            "components": [
+                {
+                    "type": "file",
+                    "name": "com/sbom/SBOMTestApplication.java",
+                    "properties": [
+                        {
+                            "name": "class",
+                            "value": "com.sbom.ClassInSameFile"
+                        },
+                        {
+                            "name": "class",
+                            "value": "com.sbom.SBOMTestApplication"
+                        },
+                        {
+                            "name": "field",
+                            "value": "com.sbom.ClassInSameFile.value1:java.lang.String"
+                        },
+                        {
+                            "name": "field",
+                            "value": "com.sbom.ClassInSameFile.value2:java.lang.String"
+                        },
+                        {
+                            "name": "field",
+                            "value": "com.sbom.SBOMTestApplication.IS_EMPTY_OR_BLANK:boolean"
+                        },
+                        {
+                            "name": "constructor",
+                            "value": "com.sbom.ClassInSameFile(java.lang.String, java.lang.String)"
+                        },
+                        {
+                            "name": "method",
+                            "value": "com.sbom.ClassInSameFile.concatenate():java.lang.String"
+                        },
+                        {
+                            "name": "method",
+                            "value": "com.sbom.SBOMTestApplication.&lt;clinit&gt;():void"
+                        },
+                        {
+                            "name": "method",
+                            "value": "com.sbom.SBOMTestApplication.main(java.lang.String[]):void"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+</code></pre>
+
+<p>The following table specifies the format of class-level metadata:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Kind</th>
+      <th>CycloneDX Object</th>
+      <th><code>type</code></th>
+      <th><code>name</code></th>
+      <th><code>value</code></th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Module</td>
+      <td>Component</td>
+      <td><code>library</code></td>
+      <td>module name</td>
+      <td>-</td>
+      <td>Unnamed module’s <code>name</code> is <code>unnamed module</code></td>
+    </tr>
+    <tr>
+      <td>Source File</td>
+      <td>Component</td>
+      <td><code>file</code></td>
+      <td>path relative to the src directory</td>
+      <td>-</td>
+      <td>Ends in <code>.java</code>, <code>/</code> separator, path derived from package name</td>
+    </tr>
+    <tr>
+      <td>Class</td>
+      <td>Property</td>
+      <td>-</td>
+      <td><code>class</code></td>
+      <td>fully qualified name</td>
+      <td>Includes anonymous, inner, and sealed classes</td>
+    </tr>
+    <tr>
+      <td>Interface</td>
+      <td>Property</td>
+      <td>-</td>
+      <td><code>interface</code></td>
+      <td>fully qualified name</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Record</td>
+      <td>Property</td>
+      <td>-</td>
+      <td><code>record</code></td>
+      <td>fully qualified name</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Annotation</td>
+      <td>Property</td>
+      <td>-</td>
+      <td><code>annotation</code></td>
+      <td>fully qualified name</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>Field</td>
+      <td>Property</td>
+      <td>-</td>
+      <td><code>field</code></td>
+      <td><code>className.fieldName:fieldType</code></td>
+      <td>Field declaration</td>
+    </tr>
+    <tr>
+      <td>Constructor</td>
+      <td>Property</td>
+      <td>-</td>
+      <td><code>constructor</code></td>
+      <td><code>className(paramType1, paramType2)</code></td>
+      <td>Parameter types comma-space separated</td>
+    </tr>
+    <tr>
+      <td>Method</td>
+      <td>Property</td>
+      <td>-</td>
+      <td><code>method</code></td>
+      <td><code>className.methodName(paramType1, paramType2):returnType</code></td>
+      <td>Method with parameters and return type</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Some additional notes:</p>
+<ul>
+  <li>Array types are suffixed with <code>[]</code>. For example, an array of strings becomes <code>java.lang.String[]</code>.</li>
+  <li>Synthetically generated lambda classes are not included.</li>
+</ul>
+
+<p>When using shaded or fat JARs, the class-level metadata can sometimes not be accurately associated with a component.
+When this happens, all unresolved metadata gets collected in a placeholder component:</p>
+<pre><code class="language-json">{
+    "type": "data",
+    "name": "class-level metadata that could not be associated with a component",
+    "components": [
+      ...
+    ]
+}
+</code></pre>
+
+<h2 id="related-documentation">Related Documentation</h2>
+
+<ul>
+  <li><a href="https://medium.com/graalvm/using-graalvm-native-image-sbom-support-for-vulnerability-scanning-4211c747376">Using GraalVM Native Image SBOM Support for Vulnerability Scanning</a></li>
+  <li><a href="/reference-manual/native-image/guides/use-sbom-support/">Embed an SBOM in a Native Executable to Identify Its Dependencies</a></li>
+  <li><a href="/security-guide/">Security Guide</a></li>
+</ul>
+
+      </div>
+  </div>
+</div>
+      </main>
+      <footer class="footer footer__mobile">
+  <div class="container-fluid container-fluid--custom-sm">
+    <div class="row footer-content">
+      <div class="footer__columns">
+        <div class="footer__columns-item">
+          <h6 class="title-footer">API Documentation</h6>
+          <div class="grow">
+            <ul class="footer-list">
+              <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
+              <li class="footer-list__item"><a href="https://www.graalvm.org/truffle/javadoc/">GraalVM Truffle Javadoc</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer__columns-item">
+          <h6 class="title-footer">Learn More</h6>
+          <div class="grow">
+            <ul class="footer-list">
+              <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
+              <li class="footer-list__item"><a href="https://www.graalvm.org/release-notes/" target="_blank">Release notes</a></li>
+              <li class="footer-list__item"><a href="https://github.com/graalvm/graalvm-demos/"
+                  target="_blank">Demos</a></li>
+              <li class="footer-list__item"><a href="https://medium.com/graalvm" target="_blank">Blog</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="row">
+        <div class="col-sm-12">
+          <p class="copyright">
+            Copyright © 2024, Oracle and/or its affiliates. All rights reserved. Oracle and Java are registered trademarks. Other names may be trademarks of their respective owners.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+
+    <div class="overlay"></div>
+
+    <script src='/resources/js/main.js'></script>
+  </body>
+
+</html>

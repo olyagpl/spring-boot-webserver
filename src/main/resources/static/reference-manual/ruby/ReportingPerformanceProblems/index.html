@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -77,9 +98,9 @@ are not needed or loops that contain no work.</p>
 
 <p>All of these issues make it hard to benchmark TruffleRuby. This is not a problem that is unique to us - it applies to many sophisticated virtual machines - but most Ruby implementations are not yet performing optimizations powerful enough to show these problems, so they may be new to some people in the Ruby community.</p>
 
-<h2 id="using-the-enterprise-edition-of-graalvm">Using the Enterprise Edition of GraalVM</h2>
+<h2 id="using-oracle-graalvm">Using Oracle GraalVM</h2>
 
-<p>To experiment with how fast TruffleRuby can be, we recommend using the <a href="/reference-manual/ruby/InstallingGraalVM/">Enterprise Edition of GraalVM</a>.</p>
+<p>To experiment with how fast TruffleRuby can be, use <a href="/reference-manual/ruby/InstallingTruffleRuby/#oracle-graalvm-and-graalvm-community-edition">Oracle GraalVM</a>.</p>
 
 <h2 id="using-the-jvm-configuration">Using the JVM Configuration</h2>
 
@@ -161,7 +182,7 @@ In general, more complex benchmarks that naturally defeat value profiling are pr
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -170,7 +191,7 @@ In general, more complex benchmarks that naturally defeat value profiling are pr
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -194,19 +215,6 @@ In general, more complex benchmarks that naturally defeat value profiling are pr
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

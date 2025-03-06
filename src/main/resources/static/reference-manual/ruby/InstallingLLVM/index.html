@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -60,36 +81,22 @@
 
       <h1 id="installing-make-and-gcc">Installing Make and GCC</h1>
 
-<p>Since TruffleRuby 19.3.0, TruffleRuby ships with its own LLVM toolchain.
-Therefore, it is no longer necessary to install LLVM.
-If you are using an older version, see <a href="https://github.com/oracle/truffleruby/blob/vm-19.2.0/doc/user/installing-llvm.md">the documentation for that version</a>.</p>
-
-<p>The <code>make</code> utility as well as the dependencies of the toolchain still need to be available to build C and C++ extensions.</p>
+<p>Since TruffleRuby 24.0.0, TruffleRuby no longer needs a LLVM toolchain and instead uses the system toolchain.
+The packages below are required to build C and C++ extensions.</p>
 
 <h3 id="fedora-based-rhel-oracle-linux-etc">Fedora-based: RHEL, Oracle Linux, etc</h3>
 
-<pre><code class="language-bash">sudo dnf install make gcc
+<pre><code class="language-bash">sudo dnf install make gcc gcc-c++
 </code></pre>
+
+<p><code>gcc-c++</code> is only necessary for building C++ extensions.</p>
 
 <h3 id="debian-based-ubuntu-etc">Debian-based: Ubuntu, etc</h3>
 
-<pre><code class="language-bash">sudo apt-get install make gcc
+<pre><code class="language-bash">sudo apt-get install make gcc g++
 </code></pre>
 
-<h3 id="mandriva-based-and-other-linux-distributions">Mandriva-based and other Linux distributions</h3>
-
-<p>Note: Such distributions are not tested and not <a href="/reference-manual/ruby/#system-compatibility">supported</a>.</p>
-
-<p>First, install the <code>make</code> and <code>gcc</code> dependencies.</p>
-
-<p>Mandriva uses a not-yet-upstreamed patch to let <code>clang</code> find the GCC installation (see <a href="https://github.com/oracle/truffleruby/issues/2009#issuecomment-630019082">this comment</a>).
-Therefore the internal LLVM toolchain cannot find the necessary <code>libgcc_s</code> by default.
-The proper fix is for those distributions to upstream their changes to LLVM.</p>
-
-<p>A workaround is to create a symlink explicitly so that the LLVM toolchain can find <code>libgcc_s</code>:</p>
-<pre><code class="language-bash">cd /usr/lib/gcc
-sudo ln -s x86_64-mandriva-linux-gnu x86_64-linux-gnu
-</code></pre>
+<p><code>g++</code> is only necessary for building C++ extensions.</p>
 
 <h3 id="macos">macOS</h3>
 
@@ -97,8 +104,6 @@ sudo ln -s x86_64-mandriva-linux-gnu x86_64-linux-gnu
 
 <pre><code class="language-bash">xcode-select --install
 </code></pre>
-
-<p>You might need to add <code>export SDKROOT=$(xcrun --show-sdk-path)</code> in your shell profile.</p>
 
       </div>
   </div>
@@ -112,7 +117,7 @@ sudo ln -s x86_64-mandriva-linux-gnu x86_64-linux-gnu
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -121,7 +126,7 @@ sudo ln -s x86_64-mandriva-linux-gnu x86_64-linux-gnu
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -145,19 +150,6 @@ sudo ln -s x86_64-mandriva-linux-gnu x86_64-linux-gnu
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

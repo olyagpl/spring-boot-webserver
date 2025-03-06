@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,7 +77,6 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="native-image-basics">Native Image Basics</h1>
 
 <p>Native Image is written in Java and takes Java bytecode as input to produce a standalone binary (an <strong>executable</strong>, or a <strong>shared library</strong>).
@@ -230,9 +250,9 @@ This created a <code>String</code> object for the <code>message</code> field and
 These elements are also referred to as <strong>reachable code</strong>.
 The analysis itself has two parts:</p>
 <ul>
-  <li>Scanning the bytecodes of a method to determine what other elements are reachable from it.</li>
-  <li>Scanning the root objects in the native image heap (i.e., static fields) to determine which classes are reachable from them.
-It starts from the entry points of the application (i.e., the <code>main</code> method).
+  <li>Scanning the bytecode of a method to determine what other elements are reachable from it.</li>
+  <li>Scanning the root objects in the native image heap (such as static fields) to determine which classes are reachable from them.
+It starts from the entry points of the application (the <code>main</code> method).
 The newly discovered elements are iteratively scanned until further scanning yields no additional changes in element’s reachability.</li>
 </ul>
 
@@ -256,7 +276,7 @@ We refer to this constraint as the <strong>closed-world assumption</strong>.</p>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -265,7 +285,7 @@ We refer to this constraint as the <strong>closed-world assumption</strong>.</p>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -289,19 +309,6 @@ We refer to this constraint as the <strong>closed-world assumption</strong>.</p>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

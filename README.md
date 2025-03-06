@@ -25,7 +25,7 @@ In this workshop you will:
 * Container runtime such as [Rancher Desktop](https://docs.rancherdesktop.io/getting-started/installation/) or [Docker](https://www.docker.com/gettingstarted/) installed and running
 * [GraalVM for JDK 24 Early Access build](https://www.graalvm.org/downloads/) or later. We recommend using [SDKMAN!](https://sdkman.io/). (For other download options, see [GraalVM Downloads](https://www.graalvm.org/downloads/).)
     ```bash
-    sdk install java 24.ea.30-graal
+    sdk install java 24.ea.32-graal
     ```
 
 ## Setup
@@ -50,9 +50,9 @@ The entrypoint for this image is equivalent to `java -jar`, so only a path to a 
 
 ### Action
 
-1. Run the _build-jar.sh_ script from the application directory:
+1. Run the _build-jar-slim.sh_ script from the application directory:
     ```bash
-    ./build-jar.sh
+    ./build-jar-slim.sh
     ```
 
 2. Once the script finishes, a container image _debian-slim.jar_ should be available. Start the application using `docker run`:

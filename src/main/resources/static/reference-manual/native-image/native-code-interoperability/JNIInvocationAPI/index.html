@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,7 +77,6 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="jni-invocation-api">JNI Invocation API</h1>
 
 <p>Native Image can be used to implement low-level system operations in Java and make them available via JNI Invocation API to Java code executing on a standard JVM.
@@ -84,7 +104,7 @@ public final class NativeImpl {
 <p>After being processed by the <code>native-image</code> builder, the code <a href="/reference-manual/native-image/native-code-interoperability/C-API/">exposes a C function</a> <code>Java_org_pkg_apinative_Native_add</code> (the name follows conventions of JNI that will be handy later) and a Native Image signature typical for JNI methods.
 The first parameter is a reference to the <code>JNIEnv*</code> value.
 The second parameter is a reference to the <code>jclass</code> value for the class declaring the method.
-The third parameter is a portable (e.g., <code>long</code>) identifier of the <a href="/reference-manual/native-image/native-code-interoperability/C-API/">Native Image isolatethread</a>.
+The third parameter is a portable (for example, <code>long</code>) identifier of the <a href="/reference-manual/native-image/native-code-interoperability/C-API/">Native Image isolatethread</a>.
 The rest of the parameters are the actual parameters of the Java <code>Native.add</code> method described in the next section. Compile the code with the <code>--shared</code> option:</p>
 <pre><code class="language-shell">$JAVA_HOME/bin/native-image --shared -H:Name=libnativeimpl -cp nativeimpl
 </code></pre>
@@ -100,7 +120,7 @@ public final class Native {
 }
 </code></pre>
 <p>The package name of the class, as well as the name of the method, has to correspond (after the <a href="https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/design.html">JNI mangling</a>) to the name of the <code>@CEntryPoint</code> introduced previously.
-The first argument is a portable (e.g., <code>long</code>) identifier of the Native Image isolate thread.
+The first argument is a portable (for example, <code>long</code>) identifier of the Native Image isolate thread.
 The rest of the arguments match the parameters of the entry point.</p>
 
 <h2 id="load-the-native-library">Load the Native Library</h2>
@@ -127,7 +147,7 @@ Let it return <code>IsolateThread</code> and take no parameters:</p>
 }
 </code></pre>
 <p>Native Image then generates default native implementation of the method into the final <code>.so</code> library.
-The method initializes the Native Image runtime and returns a portable identification, e.g., <code>long</code>, to hold an instance of a <a href="/reference-manual/native-image/native-code-interoperability/C-API/">Native Image isolatethread</a>.
+The method initializes the Native Image runtime and returns a portable identification (for example, <code>long</code>), to hold an instance of a <a href="/reference-manual/native-image/native-code-interoperability/C-API/">Native Image isolatethread</a>.
 The isolate thread can then be used for multiple invocations of the native part of your code:</p>
 <pre><code class="language-java">package org.pkg.apinative;
 
@@ -154,7 +174,7 @@ public final class Native {
 The following example shows how to make a callback to JVM.</p>
 
 <p>In the classical setup, when C needs to call into JVM, it uses a <a href="/reference-manual/native-image/dynamic-features/JNI/">jni.h</a> header file.
-The file defines essential JVM structures (like <code>JNIEnv</code>) as well as functions one can invoke to inspect classes, access fields, and call methods in the JVM.
+The file defines essential JVM structures (such as <code>JNIEnv</code>) as well as functions one can invoke to inspect classes, access fields, and call methods in the JVM.
 In order to call these functions from the <code>NativeImpl</code> class in the above example, you need to define appropriate Java API wrappers of the <code>jni.h</code> concepts:</p>
 
 <pre><code class="language-java">@CContext(JNIHeaderDirectives.class)
@@ -235,7 +255,7 @@ interface JValue extends PointerBase {
     JValue addressOf(int index);
 }
 </code></pre>
-<p>The <code>addressOf</code> method is a special Native Image construct used to perform C pointer arithmetics.
+<p>The <code>addressOf</code> method is a special Native Image construct used to perform C pointer arithmetic.
 Given a pointer, one can treat it as the initial element of an array, then, for example, use <code>addressOf(1)</code> to access the subsequent element.
 With this you have all the API needed to make a callback - redefine the previously introduced <code>NativeImpl.add</code> method to accept properly typed pointers, and then use these pointers to invoke a JVM method before computing the sum of <code>a + b</code>:</p>
 
@@ -328,7 +348,7 @@ The actual logic can, of course, be made more robust and OS-independent.</p>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -337,7 +357,7 @@ The actual logic can, of course, be made more robust and OS-independent.</p>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -361,19 +381,6 @@ The actual logic can, of course, be made more robust and OS-independent.</p>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

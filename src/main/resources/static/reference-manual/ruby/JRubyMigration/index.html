@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -64,23 +85,21 @@
 
 <h2 id="deployment">Deployment</h2>
 
-<p>If you are migrating from JRuby, probably the easiest way to use TruffleRuby is via <a href="/reference-manual/ruby/InstallingGraalVM/">GraalVM</a>, which gives you a JVM, JavaScript, Ruby, and other languages in one package.</p>
+<p>If you are migrating from JRuby, probably the easiest way to use TruffleRuby is to install the <a href="/reference-manual/ruby/#getting-started">TruffleRuby JVM Standalone</a>.</p>
 
-<p>If you do not need the Java interoperability capabilities of TruffleRuby, then you could also install via your <a href="/reference-manual/ruby/RubyManagers/">Ruby manager/installer</a> as with any other implementation of Ruby.</p>
-
-<p>You can also use the <a href="/reference-manual/ruby/StandaloneDistribution/">standalone distribution</a> as a simple tarball.
-The standalone distribution does not allow for Java interoperability.</p>
+<p>If you do not need the Java interoperability capabilities of TruffleRuby, then you can install the <a href="/reference-manual/ruby/#getting-started">TruffleRuby Native Standalone</a>.</p>
 
 <h2 id="using-ruby-from-java">Using Ruby from Java</h2>
 
 <p>JRuby supports many different ways to embed Ruby in Java, including JSR 223 (also know as <code>javax.script</code>), the Bean Scripting Framework (BSF), JRuby Embed (also known as Red Bridge), and the JRuby direct embedding API.</p>
 
-<p>Thes best way to embed TruffleRuby is to use the Polyglot API, which is part of GraalVM.
+<p>The best way to embed TruffleRuby is to use the Polyglot API.
 The API is different because it is designed to support many languages, not just Ruby.</p>
 
-<p>TruffleRuby also supports JSR 223, compatible with JRuby, to make it easier to run legacy JRuby code.</p>
+<p>TruffleRuby also supports JSR 223, compatible with JRuby, to make it easier to run legacy JRuby code.
+See <a href="/reference-manual/embed-languages/#compatibility-with-jsr-223-scriptengine">this documentation</a> for how to use it.</p>
 
-<p>You will need to use GraalVM to use both of these APIs.</p>
+<p>You will need to use the JVM standalone or depend on the <code>org.graalvm.polyglot:polyglot</code> Maven package to use the Polyglot API.</p>
 
 <p>See the <a href="/reference-manual/ruby/Polyglot/">polyglot</a> documentation for more information about how to use Ruby from other languages including Java; this document only shows the comparison to JRuby.</p>
 
@@ -351,27 +370,30 @@ This is not compatible with existing JRuby-Java interoperability, so you will ne
 # With the 'require' above, you now can refer to things that are part of the
 # standard Java platform via their full paths.
 frame = javax.swing.JFrame.new("Window") # Creating a Java JFrame
-label = javax.swing.JLabel.new("Hello")
+label = javax.swing.JLabel.new("Hello World")
 
 # You can transparently call Java methods on Java objects, just as if they were defined in Ruby.
 frame.add(label)  # Invoking the Java method 'add'.
-frame.setDefaultCloseOperation(javax.swing.JFrame::EXIT_ON_CLOSE)
+frame.setDefaultCloseOperation(javax.swing.WindowConstants::EXIT_ON_CLOSE)
 frame.pack
 frame.setVisible(true)
+sleep
 </code></pre>
 
 <p>In TruffleRuby we would write that this way instead:</p>
 
 <pre><code class="language-ruby">Java.import 'javax.swing.JFrame'
 Java.import 'javax.swing.JLabel'
+Java.import 'javax.swing.WindowConstants'
 
 frame = JFrame.new("Window")
-label = JLabel.new("Hello")
+label = JLabel.new("Hello World")
 
 frame.add(label)
-frame.setDefaultCloseOperation(JFrame[:EXIT_ON_CLOSE])
+frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
 frame.pack
 frame.setVisible(true)
+sleep
 </code></pre>
 
 <p>Instead of using Ruby metaprogramming to simulate a Java package name, we explicitly import classes.
@@ -382,7 +404,7 @@ frame.setVisible(true)
 <h3 id="require-java">Require Java</h3>
 
 <p>Do not <code>require 'java'</code> in TruffleRuby. However, you do need to run in <code>--jvm</code> mode.
-This is only available in GraalVM - not in the standalone distribution installed by Ruby version managers and installers.</p>
+This is not available in the Native Standalone.</p>
 
 <h3 id="referring-to-classes">Referring to Classes</h3>
 
@@ -403,11 +425,29 @@ This is only available in GraalVM - not in the standalone distribution installed
 <p>JRuby will rewrite method names such as <code>my_method</code> to the Java convention of <code>myMethod</code>, and convert <code>getFoo</code> to <code>foo</code>, and <code>setFoo</code> to <code>foo=</code>.
 TruffleRuby does not perform these conversions.</p>
 
+<h3 id="calling-overloaded-method">Calling Overloaded Method</h3>
+
+<p>When multiple overloads are possible, it needs to be selected explicitly.
+For instance <code>java.util.concurrent.ExecutorService</code> has both <code>submit(Runnable)</code> and <code>submit(Callable&lt;T&gt; task)</code>.
+Calling submit without specifying which one shows the possible overloads:</p>
+<pre><code>$ ruby -e 'Java.type("java.util.concurrent.Executors").newFixedThreadPool(1).submit {}'
+-e:1:in `main': Multiple applicable overloads found for method name submit (candidates: [
+  Method[public java.util.concurrent.Future java.util.concurrent.AbstractExecutorService.submit(java.util.concurrent.Callable)],
+  Method[public java.util.concurrent.Future java.util.concurrent.AbstractExecutorService.submit(java.lang.Runnable)]],
+  arguments: [RubyProc@4893b344 (RubyProc)]) (TypeError)
+</code></pre>
+
+<p>You can select a specific overload using:</p>
+<pre><code class="language-ruby">executor = Java.type("java.util.concurrent.Executors").newFixedThreadPool(1)
+executor['submit(java.lang.Runnable)'].call(-&gt; { 1 })
+# or
+executor.send("submit(java.lang.Runnable)") { 1 }
+</code></pre>
+
 <h3 id="referring-to-constants">Referring to Constants</h3>
 
 <p>In JRuby, Java constants are modelled as Ruby constants, <code>MyClass::FOO</code>.
-In TruffleRuby you use the read notation to read them as a property,
-<code>MyClass[:FOO]</code>.</p>
+In TruffleRuby you use the read notation to read them as a property, <code>MyClass.FOO</code> or <code>MyClass[:FOO]</code>.</p>
 
 <h3 id="using-classes-from-jar-files">Using Classes from JAR files</h3>
 
@@ -509,7 +549,7 @@ We recommend using Java interop as described above.</p>
 
 <p>VisualVM works for TruffleRuby as for JRuby.</p>
 
-<p>Additionally, the VisualVM included in GraalVM understands Ruby objects, rather than Java objects, when you use the heap dump tool.</p>
+<p>Additionally, VisualVM understands Ruby objects, rather than Java objects, when you use the heap dump tool.</p>
 
       </div>
   </div>
@@ -523,7 +563,7 @@ We recommend using Java interop as described above.</p>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -532,7 +572,7 @@ We recommend using Java interop as described above.</p>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -556,19 +596,6 @@ We recommend using Java interop as described above.</p>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

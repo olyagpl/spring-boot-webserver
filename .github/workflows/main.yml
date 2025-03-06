@@ -16,7 +16,8 @@ jobs:
     - name: Run Spring Boot Web Server
       run: |
         # Build JAR (Debian Slim)
-        ./build-jar.sh
+        ./build-jar-java-base.sh
+        ./build-jar-slim.sh
         #
 
         # Build Jlink custom runtime (Distroless Java Base)
@@ -38,6 +39,10 @@ jobs:
 
         # Build mostly static image (Distroless Base)
         ./build-mostly-static-image.sh
+        #
+
+        # Build fully static image (Alpine)
+        ./build-alpine-static-image.sh
         #
 
         # Build fully static image (Scratch)

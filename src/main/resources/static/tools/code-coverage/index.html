@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,7 +77,6 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="code-coverage-command-line-tool">Code Coverage Command Line Tool</h1>
 
 <p>GraalVM provides a <strong>code coverage command line tool</strong> that lets users record and analyze the source code coverage of a particular execution of code.</p>
@@ -161,7 +181,7 @@ Code coverage per line of code and what percent of each element was covered duri
   + indicates the line is covered during execution
   - indicates the line is not covered during execution
   p indicates the line is part of a statement that was incidentally covered during execution
-    e.g. a not-taken branch of a covered if statement
+    for example, a not-taken branch of a covered if statement
 --------------------------------------------------------
  Path               |  Statements |    Lines |    Roots
  /path/to/primes.js |      20.69% |   26.67% |   22.22%
@@ -222,7 +242,7 @@ p     if (n &gt; cache.length) { return calculatePrime(n); }
 
 <p>As the legend at the beginning of the output explains, lines that are covered by the execution are preceded with a <code>+</code>.
 Lines not covered by the execution are preceded with a <code>-</code>.
-Lines that are covered partially are preceded with <code>p</code> (e.g., when an <code>if</code> statement is covered but only one branch is taken, consider the other bench to be incidentally covered).</p>
+Lines that are covered partially are preceded with <code>p</code> (for example, when an <code>if</code> statement is covered but only one branch is taken, consider the other bench to be incidentally covered).</p>
 
 <p>Looking at the output you can see that the <code>calculatePrime</code> function and all its calls are never executed. Looking again at the assertions and the <code>getPrime</code>
 function, it becomes clear that our tests always hit the cache.
@@ -247,8 +267,8 @@ Code coverage histogram.
 <h2 id="integrating-with-other-tools">Integrating with Other Tools</h2>
 
 <p>The code coverage tool provides ways to integrate with other tools.
-Running with <code>--coverage.Output=lcov</code> produces output in the commonly used <a href="https://linux.die.net/man/1/lcov">lcov</a> format which is used by multiple tools (e.g., <code>genhtml</code>) to display coverage data.
-Take a look at the next example that shows how to visualise coverage of a Node.js app with Visual Studio Code.</p>
+Running with <code>--coverage.Output=lcov</code> produces output in the commonly used <a href="https://linux.die.net/man/1/lcov">lcov</a> format which is used by multiple tools (for example, <code>genhtml</code>) to display coverage data.
+Take a look at the next example that shows how to visualize coverage of a Node.js app with Visual Studio Code.</p>
 
 <ol>
   <li>Copy the following code into a new file named <code>nodeapp.js</code>:</li>
@@ -300,9 +320,9 @@ nodeapp.js
   </li>
 </ol>
 
-<p><img src="/docs/tools/img/vscode-coverage.png" alt="" /></p>
+<p><img src="/docs/tools/img/vscode-coverage.png" alt="Visual Studio Code Coverage" /></p>
 
-<p>If you wish to integrate the data gathered by the GraalVM code coverage tool with your own visualisation, the <code>--coverage.Output=json</code> option results in the output being a JSON file with the raw data gathered by the tracker.</p>
+<p>If you wish to integrate the data gathered by the GraalVM code coverage tool with your own visualization, the <code>--coverage.Output=json</code> option results in the output being a JSON file with the raw data gathered by the tracker.</p>
 
       </div>
   </div>
@@ -313,7 +333,7 @@ nodeapp.js
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -322,7 +342,7 @@ nodeapp.js
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -346,19 +366,6 @@ nodeapp.js
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

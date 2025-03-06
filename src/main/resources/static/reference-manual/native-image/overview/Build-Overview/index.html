@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,29 +77,51 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="native-image-build-overview">Native Image Build Overview</h1>
 
 <p>The syntax of the <code>native-image</code> command is:</p>
 
 <ul>
-  <li><code>native-image [options] &lt;mainclass&gt; [imagename] [options]</code> to build a native binary from <code>&lt;mainclass&gt;</code> class in the current working directory. The classpath may optionally be provided with the <code>-cp &lt;classpath&gt;</code> option where <code>&lt;classpath&gt;</code> is a colon-separated (on Windows, semicolon-separated) list of paths to directories and jars.</li>
-  <li><code>native-image [options] -jar jarfile [imagename] [options]</code> to build native binary from a JAR file.</li>
+  <li><code>native-image [options] &lt;mainclass&gt; [imagename] [options]</code> to build a native binary from the main class in the current working directory. The class path may optionally be provided with the <code>-cp &lt;classpath&gt;</code> option where <code>&lt;classpath&gt;</code> is a colon-separated (on Windows, semicolon-separated) list of paths to directories and JAR files.</li>
+  <li><code>native-image [options] -jar jarfile [imagename] [options]</code> to build a native binary from a JAR file.</li>
   <li><code>native-image [options] -m &lt;module&gt;/&lt;mainClass&gt; [imagename] [options]</code> to build a native binary from a Java module.</li>
 </ul>
 
-<p>The options passed to <code>native-image</code> are evaluated from left to right.</p>
+<p>The options passed to <code>native-image</code> are evaluated from left to right.
+For an overview of options that can be passed to <code>native-image</code>, see <a href="/reference-manual/native-image/overview/Options/">here</a>.</p>
 
-<p>The options fall into three categories:</p>
-<ul>
-  <li><a href="/reference-manual/native-image/overview/BuildOptions/#native-image-build-options">Image generation options</a> - for the full list, run <code>native-image --help</code></li>
-  <li><a href="/reference-manual/native-image/overview/BuildOptions/#macro-options">Macro options</a></li>
-  <li><a href="/reference-manual/native-image/overview/BuildOptions/#non-standard-options">Non-standard options</a> - subject to change through a deprecation cycle, run <code>native-image --help-extra</code> for the full list.</li>
-</ul>
+<h2 id="getting-notified-when-the-build-process-is-done">Getting Notified When the Build Process Is Done</h2>
 
-<p>Find a complete list of options for the <code>native-image</code> tool <a href="/reference-manual/native-image/overview/BuildOptions/">here</a>.</p>
+<p>Depending on the size of your application and the available resources of your build machine, it can take a few minutes to compile your Java application into a native executable.
+If you are building your application in the background, consider using a command that notifies you when the build process is completed.
+Below, example commands are listed per operating system:</p>
 
-<p>There are some expert level options that a Native Image developer may find useful or needed, for example, the option to dump graphs of the <code>native-image</code> builder or enable assertions at image run time. This information can be found in <a href="/reference-manual/native-image/overview/HostedvsRuntimeOptions/">Native Image Hosted and Runtime Options</a>.</p>
+<h4 id="linux">Linux</h4>
+<pre><code class="language-bash"># Ring the terminal bell
+native-image -jar App.jar ... ; printf '\a'
+
+# Use libnotify to create a desktop notification
+native-image -jar App.jar ... ; notify-send "GraalVM Native Image build completed with exit code $?"
+
+# Use Zenity to open an info dialog box with text
+native-image -jar App.jar ... ; zenity --info --text="GraalVM Native Image build completed with exit code $?"
+</code></pre>
+
+<h4 id="macos">macOS</h4>
+<pre><code class="language-bash"># Ring the terminal bell
+native-image -jar App.jar ... ; printf '\a'
+
+# Use Speech Synthesis
+native-image -jar App.jar ... ; say "GraalVM Native Image build completed"
+</code></pre>
+
+<h4 id="windows">Windows</h4>
+<pre><code class="language-bash"># Ring the terminal bell (press Ctrl+G to enter ^G)
+native-image.exe -jar App.jar &amp; echo ^G
+
+# Open an info dialog box with text
+native-image.exe -jar App.jar &amp; msg "%username%" GraalVM Native Image build completed
+</code></pre>
 
 <h3 id="further-reading">Further Reading</h3>
 
@@ -86,7 +129,9 @@
 
 <p>For more tweaks and how to properly configure the <code>native-image</code> tool, see <a href="/reference-manual/native-image/overview/BuildConfiguration/#order-of-arguments-evaluation">Build Configuration</a>.</p>
 
-<p>Native Image will output the progress and various statistics when building the native binary. To learn more about the output, and the different build phases, see <a href="/reference-manual/native-image/overview/BuildOutput/">Build Output</a>.</p>
+<p>Native Image outputs the progress and various statistics when building a native binary. To learn more about the output, and the different build phases, see <a href="/reference-manual/native-image/overview/BuildOutput/">Build Output</a>.</p>
+
+<p>For more detailed information about the build process, its phases, and the contents of a produced native binary, see <a href="/reference-manual/native-image/overview/build-report/">Build Report</a>.</p>
 
       </div>
   </div>
@@ -97,7 +142,7 @@
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -106,7 +151,7 @@
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -130,19 +175,6 @@
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

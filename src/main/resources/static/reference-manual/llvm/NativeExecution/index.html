@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,7 +77,6 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="interaction-of-graalvm-with-native-code">Interaction of GraalVM with Native Code</h1>
 
 <p>The GraalVM LLVM runtime allows users to run code written in languages that traditionally compile directly to native code.
@@ -75,8 +95,8 @@ Therefore, special care is needed to consider the interaction of this code with 
   <li>Process control and threading is done based on the following aspects:
     <ul>
       <li>GraalVM assumes it has full control over threading.</li>
-      <li>Multi-threading is supported via the <code>pthreads</code> library (for example, <code>pthread_create</code>).</li>
-      <li>Directly using process related syscalls like <code>clone</code>, <code>fork</code>, <code>vfork</code>, etc. is not supported.</li>
+      <li>Multithreading is supported via the <code>pthreads</code> library (for example, <code>pthread_create</code>).</li>
+      <li>Directly using process related syscalls such as <code>clone</code>, <code>fork</code>, <code>vfork</code>, etc. is not supported.</li>
       <li>The <code>exec</code> function family is not supported.</li>
     </ul>
   </li>
@@ -123,7 +143,7 @@ Syscalls are virtualized and routed through appropriate GraalVM APIs.</p>
 
 <h2 id="polyglot-interaction-between-native-code-and-managed-languages">Polyglot Interaction Between Native Code and Managed Languages</h2>
 
-<p>When using polyglot interoperability between LLVM languages (e.g., C/C++) and managed languages (e.g., JavaScript, Python, Ruby), some care must be taken with the manual memory management.
+<p>When using polyglot interoperability between LLVM languages (for example, C/C++) and managed languages (such as JavaScript, Python, or Ruby), some care must be taken with the manual memory management.
 Note that this section only applies to the native mode of execution (the default).
 In managed mode (enabled with the <code>--llvm.managed</code> option and only available in Oracle GraalVM), the LLVM runtime itself behaves like a managed language, and the polyglot interaction is the same as between other managed languages.</p>
 
@@ -131,12 +151,12 @@ In managed mode (enabled with the <code>--llvm.managed</code> option and only av
   <li>Garbage collection policies to be considered:
     <ul>
       <li>Pointers to objects of managed languages are managed by a garbage collector, therefore they do not need to be freed manually.</li>
-      <li>On the other hand, pointers to allocations from the LLVM code (e.g., <code>malloc</code>) are not under control of the garbage collector, so they need to be deallocated manually.</li>
+      <li>On the other hand, pointers to allocations from the LLVM code (for example, <code>malloc</code>) are not under control of the garbage collector, so they need to be deallocated manually.</li>
     </ul>
   </li>
   <li>Unmanaged heap policies to be considered:
     <ul>
-      <li>Native memory (e.g., <code>malloc</code>, data sections, thread locals) is not under the control of a garbage collector.</li>
+      <li>Native memory (for example, <code>malloc</code>, data sections, thread locals) is not under the control of a garbage collector.</li>
       <li>Pointers to foreign objects controlled by the garbage collector can not be stored in native memory directly.</li>
       <li>There are handle functions available to work around this limitation (see <code>graalvm/llvm/handles.h</code>).</li>
     </ul>
@@ -152,7 +172,7 @@ In managed mode (enabled with the <code>--llvm.managed</code> option and only av
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -161,7 +181,7 @@ In managed mode (enabled with the <code>--llvm.managed</code> option and only av
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -185,19 +205,6 @@ In managed mode (enabled with the <code>--llvm.managed</code> option and only av
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

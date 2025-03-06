@@ -1,0 +1,304 @@
+<div class="container-fluid container-fluid--custom-sm light-back">
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1 top-layout-indent">
+      <br>
+      <a href='/reference-manual/native-image/guides/' class="link-back"><i>&#9664;</i>Back</a>
+      <h1 id="optimize-memory-footprint-of-a-native-executable">Optimize Memory Footprint of a Native Executable</h1>
+
+<p>Choosing an appropriate garbage collector and tailoring the garbage collection configuration can reduce GC times and memory footprint.
+When running a native image, Java heap settings are determined based on the system configuration and GC.
+You can override the default configuration to further improve your use case on the relevant metrics.</p>
+
+<p>This guide demonstrates how to optimize an application in the area of memory consumption and trade off between GC pause times, memory footprint, and performance.</p>
+
+<h3 id="prerequisite">Prerequisite</h3>
+
+<p>Make sure you have installed Oracle GraalVM for JDK 23 or later.
+The easiest way to get started is with <a href="https://sdkman.io/jdks#graal" target="_blank">SDKMAN!</a>.
+For other installation options, visit the <a href="https://www.graalvm.org/downloads/" target="_blank">Downloads</a> section.</p>
+
+<h2 id="1-prepare-the-application">1. Prepare the Application</h2>
+
+<p>A Java application that does some heavy text processing, like log analysis, where large strings are frequently concatenated, split, or manipulated, is a good approach to stress test the garbage collector.</p>
+
+<p>The application you will use generates a significant number of temporary strings putting pressure on the GC.</p>
+
+<ol>
+  <li>Save the following Java code in a file named <em>StringManipulation.java</em>:
+    <pre><code class="language-java"> import java.util.ArrayDeque;
+
+ public class StringManipulation {
+
+     public static void main(String[] args) {
+         System.out.println("Starting string manipulation GC stress test...");
+
+         // Parse arguments
+         int iterations = 1000000;
+         int numKeptAliveObjects = 100000;
+         if (args.length &gt; 0) {
+             iterations = Integer.parseInt(args[0]);
+         }
+         if (args.length &gt; 1) {
+             numKeptAliveObjects = Integer.parseInt(args[1]);
+         }
+
+         ArrayDeque&lt;String[]&gt; aliveData = new ArrayDeque&lt;String[]&gt;(numKeptAliveObjects + 1);
+         for (int i = 0; i &lt; iterations; i++) {
+             // Simulate log entry generation and log entry splitting. The last n entries are kept in memory.
+             String base = "log-entry";
+             StringBuilder builder = new StringBuilder(base);
+
+             for (int j = 0; j &lt; 100; j++) {
+                 builder.append("-").append(System.nanoTime());
+             }
+
+             String logEntry = builder.toString();
+             String[] parts = logEntry.split("-");
+
+             aliveData.addLast(parts);
+             if (aliveData.size() &gt; numKeptAliveObjects) {
+                 aliveData.removeFirst();
+             }
+
+             // Periodically log progress
+             if (i % 100000 == 0) {
+                 System.out.println("Processed " + i + " log entries");
+             }
+         }
+
+         System.out.println("String manipulation GC stress test completed: " + aliveData.hashCode());
+     }
+ }
+</code></pre>
+    <p>At run time, you specify on the command line how long this application should run (the 1st argument, number of iterations) and how much memory it should keep alive (the 2nd argument).</p>
+  </li>
+  <li>Compile and run the application on HotSpot, timing the results:
+    <pre><code class="language-bash"> javac StringManipulation.java
+</code></pre>
+    <pre><code class="language-bash"> /usr/bin/time java StringManipulation 500000 50000
+</code></pre>
+
+    <p>On a machine with 48GB of memory, 8 CPUs, and the default G1 GC on HotSpot, the results should be similar, displaying the user and elapsed time, system CPU usage, and the maximum memory usage required to execute this request:</p>
+    <pre><code> Starting string manipulation GC stress test...
+ Processed 0 log entries
+ Processed 100000 log entries
+ Processed 200000 log entries
+ Processed 300000 log entries
+ Processed 400000 log entries
+ String manipulation GC stress test completed: 1791741888
+ 6.61user 0.57system 0:03.35elapsed 214%CPU (0avgtext+0avgdata 4046128maxresident)k
+ 0inputs+64outputs (8major+39776minor)pagefaults 0swaps
+</code></pre>
+    <p>The results show a wall-clock time of 3.35 seconds, a total CPU time of 6.61 seconds + 0.57 seconds (indicating actual CPU usage), and a maximum memory usage of 3.85GB (resident set size, RSS).</p>
+  </li>
+</ol>
+
+<h2 id="2-build-a-native-image-with-default-gc">2. Build a Native Image with Default GC</h2>
+
+<p>Now compile this application ahead of time with the default garbage collector in Native Image which is <a href="/reference-manual/native-image/optimizations-and-performance/MemoryManagement/#serial-garbage-collector">Serial GC</a>.
+Serial GC is a non-parallel, stop and copy GC optimized for low memory footprint and small Java heap sizes.</p>
+
+<ol>
+  <li>Build with <code>native-image</code>:
+    <pre><code class="language-bash"> native-image -o testgc-serial StringManipulation
+</code></pre>
+    <p>The <code>-o</code> option defines the name of the output file to be generated.</p>
+
+    <p>The build output prints the GC information at the <a href="/reference-manual/native-image/overview/BuildOutput/#build-stages">Initialization stage</a> which is:</p>
+    <pre><code> [1/8] Initializing...
+ ...
+ Garbage collector: Serial GC (max heap size: 80% of RAM)
+ ...
+</code></pre>
+  </li>
+  <li>Run the native executable with the same arguments, timing the results:
+    <pre><code class="language-bash"> /usr/bin/time ./testgc-serial 500000 50000
+</code></pre>
+    <p>The resources usage is now different:</p>
+    <pre><code> Starting string manipulation GC stress test...
+ ...
+ 8.82user 1.24system 0:10.10elapsed 99%CPU (0avgtext+0avgdata 611272maxresident)k
+ 0inputs+0outputs (0major+854664minor)pagefaults 0swaps
+</code></pre>
+
+    <p>When using the default GC, this benchmark shows higher elapsed time but a lower maximum resident set size compared to the HotSpot run above.</p>
+  </li>
+  <li>Get more insights for this GC by passing <code>-XX:+PrintGC</code> at run time to print the logs:
+    <pre><code class="language-bash"> /usr/bin/time ./testgc-serial 500000 50000 -XX:+PrintGC
+</code></pre>
+    <p>Notice that pause times are high with Serial GC, which can be a problem for applications where latency is important. For example:</p>
+    <pre><code> [9.301s] GC(55) Pause Full GC (Collect on allocation) 400.19M-&gt;214.69M 318.384ms
+</code></pre>
+    <p>Here, the GC paused the application for 318.384ms.</p>
+  </li>
+</ol>
+
+<h2 id="3-build-a-native-image-with-g1-gc">3. Build a Native Image with G1 GC</h2>
+
+<p>The next step is to change the garbage collector. 
+Native Image supports the <a href="/reference-manual/native-image/optimizations-and-performance/MemoryManagement/#g1-garbage-collector">G1 garbage collector</a> by passing <code>--gc=G1</code> to the <code>native-image</code> builder. 
+G1 GC is a generational, incremental, parallel, mostly concurrent, stop-the-world GC, recommended for improving latency and throughput of the application.</p>
+
+<blockquote>
+  <p>G1 GC is available with Oracle GraalVM and supported on Linux only.</p>
+</blockquote>
+
+<blockquote>
+  <p>We recommend using G1 GC in combination with <a href="/reference-manual/native-image/guides/optimize-native-executable-with-pgo/">Profile-Guided Optimization (PGO)</a> for the best application performance. However, PGO is not applied in this guide to keep the instructions straightforward.</p>
+</blockquote>
+
+<ol>
+  <li>Build the second native executable with G1 GC, specifing a different name for the output file, so the executables will not overwrite each other:
+    <pre><code class="language-bash"> native-image --gc=G1 -o testgc-g1 StringManipulation
+</code></pre>
+
+    <p>The build output now prints a different GC information:</p>
+    <pre><code> [1/8] Initializing...
+ ...
+ Garbage collector: G1 GC (max heap size: 25.0% of RAM)
+</code></pre>
+  </li>
+  <li>Run this native executable with the same arguments, passing also <code>-XX:+PrintGC</code> to get more insights into pause times, and compare the results:
+    <pre><code class="language-bash"> /usr/bin/time ./testgc-g1 500000 50000 -XX:+PrintGC
+</code></pre>
+    <pre><code> ...
+ Processed 300000 log entries
+ [2.705s][info][gc] GC(16) Pause Young (Normal) (G1 Evacuation Pause) 2301M-&gt;1690M(4840M) 25.144ms
+ Processed 400000 log entries
+ [3.322s][info][gc] GC(17) Pause Young (Normal) (G1 Evacuation Pause) 2715M-&gt;1870M(4840M) 20.364ms
+ String manipulation GC stress test completed: 305943342
+ 5.77user 0.47system 0:03.85elapsed 161%CPU (0avgtext+0avgdata 3707920maxresident)k
+ 0inputs+0outputs (0major+12980minor)pagefaults 0swaps
+</code></pre>
+
+    <p>G1 GC is significantly faster than Serial GC, so the wall-clock time drops from 10.1s to 3.85s.
+ Pause times are much better!
+ However, memory usage with G1 GC is higher than with Serial GC.</p>
+
+    <p>When compared with the HotSpot execution above (which also uses the G1 GC), performance is on the same level, while memory usage is lower (3.68GB versus 3.85GB) because objects are more compact in Native Image than on HotSpot.
+ The total CPU time is lower as well.</p>
+  </li>
+</ol>
+
+<h2 id="4-build-a-native-image-with-epsilon-gc">4. Build a Native Image with Epsilon GC</h2>
+
+<p>There is one more garbage collector supported by Native Image: <a href="/reference-manual/native-image/optimizations-and-performance/MemoryManagement/">Epsilon GC</a>.
+Epsilon GC is a no-op garbage collector that does not do any garbage collection and therefore never frees any allocated memory.
+The primary use case for this GC are very short running applications that only allocate a small amount of memory.</p>
+
+<p>Epsilon GC should only be used in very specific cases.
+We recommend always comparing Epsilon GC against the default GC (Serial GC) to determine if Epsilon GC really provides an actual benefit for your application.</p>
+
+<ol>
+  <li>To enable the Epsilon GC, pass <code>--gc=epsilon</code> at image build time:
+    <pre><code class="language-bash"> native-image --gc=epsilon -o testgc-epsilon StringManipulation
+</code></pre>
+
+    <p>The build output reports about Epsilon GC being used:</p>
+    <pre><code> [1/8] Initializing...
+ ...
+ Garbage collector: Epsilon GC (max heap size: 80% of RAM)
+</code></pre>
+  </li>
+  <li>Run this native image but increase the number of iterations:
+    <pre><code class="language-bash"> /usr/bin/time ./testgc-epsilon 3200000 50000
+</code></pre>
+    <pre><code> Starting string manipulation GC stress test...
+ ...
+ Processed 3100000 log entries
+ Exception in thread "main" 
+ Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread "main"
+ PlatformThreads.ensureCurrentAssigned() failed during shutdown: java.lang.OutOfMemoryError: Could not allocate an aligned heap chunk because the heap address space is exhausted. Consider re-building the image with compressed references disabled ('-H:-UseCompressedReferences').
+ Command exited with non-zero status 1
+ 21.07user 13.11system 0:34.25elapsed 99%CPU (0avgtext+0avgdata 33556824maxresident)k
+ 0inputs+0outputs (0major+8387698minor)pagefaults 0swaps
+</code></pre>
+    <p>The <code>OutOfMemoryError</code> exception happens because Epsilon GC does not do any garbage collection, and the heap is full at some point.
+ You need to reduce how long this application should run.</p>
+
+    <p>The usage results are not comparable to the ones in the previous steps because more work was performed (more iterations).</p>
+  </li>
+</ol>
+
+<h2 id="5-build-a-native-image-setting-the-maximum-heap-size">5. Build a Native Image Setting the Maximum Heap Size</h2>
+
+<p>By default, a native image will set its maximum Java heap size to 80% of the physical memory when using Serial or Epsilon GC, and to 25% when using G1 GC.
+For example, on a machine with 16GB of RAM, the maximum heap size will be set to 12.8GB with Serial or Epsilon GC.
+However, if you run on Oracle GraalVM with compressed references support enabled, the maximum Java heap cannot be larger than 32GB.
+This information can be found in the output for each build.</p>
+
+<p>To override the default behavior, you can explicitly set the maximum heap size.
+There are two ways to do that.</p>
+
+<h3 id="51-set-the-maximum-heap-size-at-run-time">5.1. Set the Maximum Heap Size at Run Time</h3>
+
+<p>The first and recommended way is to build a native image with the default heap settings, and then override the maximum heap size in bytes at run time using <code>-Xmx</code>.
+Test this option with both Serial G1 and G1 GC native images.</p>
+
+<ol>
+  <li>Serial GC:
+    <pre><code class="language-bash"> /usr/bin/time ./testgc-serial -Xmx512m 500000 50000
+</code></pre>
+    <pre><code> Starting string manipulation GC stress test...
+ ...
+ 9.53user 1.40system 0:10.99elapsed 99%CPU (0avgtext+0avgdata 590404maxresident)k
+ 0inputs+0outputs (0major+953535minor)pagefaults 0swaps
+</code></pre>
+  </li>
+  <li>G1 GC:
+    <pre><code class="language-bash"> /usr/bin/time ./testgc-g1 -Xmx512m 500000 50000
+</code></pre>
+    <pre><code> Starting string manipulation GC stress test...
+ ...
+ 14.99user 0.41system 0:05.13elapsed 300%CPU (0avgtext+0avgdata 554004maxresident)k
+ 0inputs+0outputs (0major+5622minor)pagefaults 0swaps
+</code></pre>
+  </li>
+</ol>
+
+<h3 id="52-define-the-maximum-heap-size-at-build-time">5.2. Define the Maximum Heap Size at Build Time</h3>
+
+<p>The second way is to build a native image and set a new default value for the maximum heap size using the <code>-R:MaxHeapSize</code> option.
+This default will then be used at run time, unless it is explicitly overridden at run time by passing the <code>-X...</code> or <code>-XX:...</code> options.</p>
+
+<ol>
+  <li>Create a new native executable:
+    <pre><code class="language-bash"> native-image --gc=G1 -R:MaxHeapSize=512m -o testgc-maxheapset-g1 StringManipulation
+</code></pre>
+    <p>Notice the updated GC information:</p>
+    <pre><code> [1/8] Initializing...
+ ...
+ Garbage collector: G1 GC (max heap size: 512.00MB)
+</code></pre>
+  </li>
+  <li>Run it with the same load:
+    <pre><code class="language-bash"> /usr/bin/time ./testgc-maxheapset-g1 500000 50000
+</code></pre>
+    <p>On this test machine, the results should match the previous numbers at step 5.1:</p>
+    <pre><code> Starting string manipulation GC stress test...
+ ...
+ 14.87user 0.44system 0:05.33elapsed 287%CPU (0avgtext+0avgdata 552292maxresident)k
+ 0inputs+0outputs (0major+5694minor)pagefaults 0swaps
+</code></pre>
+  </li>
+</ol>
+
+<blockquote>
+  <p>Besides <code>-Xmx</code>, there are plenty of other GC-specific options that experts can use for performance tuning, for example, <code>-XX:MaxGCPauseMillis</code> to set target maximum pause times. Find a full list of performance tuning options in the <a href="/reference-manual/native-image/optimizations-and-performance/MemoryManagement/#performance-tuning">reference documentation</a>.</p>
+</blockquote>
+
+<h3 id="summary">Summary</h3>
+
+<p>Selecting the right garbage collector and configuring a suitable garbage collection configuration can significantly reduce GC pauses and improve overall application responsiveness.
+You can achieve more predictable memory usage, helping your native application run more efficiently under varying workloads.
+This guide provides insights into choosing the best GC strategy depending on your application goals: low latency, minimal memory overhead, or optimal performance.</p>
+
+<h3 id="related-documentation">Related Documentation</h3>
+
+<ul>
+  <li><a href="/reference-manual/native-image/optimizations-and-performance/MemoryManagement/">Memory Management in Native Image</a></li>
+</ul>
+
+      </div>
+  </div>
+</div>

@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,35 +77,35 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
+      <h1 id="native-image-inspect-tool">Native Image Inspect Tool</h1>
 
-      <h1 id="native-image-inspection-tool">Native Image Inspection Tool</h1>
+<p>The Native Image Inspect Tool extracts embedded Software Bill of Materials (SBOM) from native executables. The functionality for extracting class-level metadata is now deprecated.</p>
 
-<p>Native Image provides the inspection tool to list all methods included in a native executable or a native shared library. Run the command <code>$JAVA_HOME/bin/native-image-inspect &lt;path_to_binary&gt;</code> to list classes, methods, fields, and constructors in the JSON format that validates against the JSON schema defined in <a href="/docs/reference-manual/native-image/assets/native-image-inspect-schema-v0.2.0.json"><code>native-image-inspect-schema-v0.2.0.json</code></a>.</p>
+<h2 id="extracting-embedded-sbom">Extracting Embedded SBOM</h2>
+
+<p>Native Image can embed a SBOM at build time to detect any libraries that may be susceptible to known security vulnerabilities.
+Native Image provides the <code>--enable-sbom</code> option to embed an SBOM into a native executable (only available in Oracle GraalVM).</p>
+
+<p>The Native Image Inspect Tool can extract the compressed SBOM using the optional <code>--sbom</code> parameter, as shown in the command: <code>$JAVA_HOME/bin/native-image-inspect --sbom &lt;path_to_binary&gt;</code>.</p>
+
+<h2 id="extracting-class-level-metadata-deprecated">Extracting Class-Level Metadata (Deprecated)</h2>
 
 <blockquote>
-  <p>Note: The inspection tool is not available in GraalVM Community Edition.</p>
+  <p>The extraction of class-level metadata using <code>native-image-inspect</code> is deprecated. In GraalVM for JDK 24, a deprecation warning is printed to <code>stderr</code>, and this functionality will be removed in GraalVM for JDK 25. Please migrate to using <a href="/security-guide/native-image/sbom/#including-class-level-metadata-in-the-sbom">class-level SBOMs</a> instead by passing <code>--enable-sbom=class-level,export</code> to the <code>native-image</code> builder, which generates an SBOM containing the same kind of class-level metadata information.</p>
 </blockquote>
 
-<p>The <code>native-image</code> builder, by default, includes metadata in the native executable which then enables the inspection tool to list the included methods.</p>
+<p>Native Image provides the Inspect Tool to list all classes, fields, and methods included in a native executable or a native shared library. 
+Run the command <code>$JAVA_HOME/bin/native-image-inspect &lt;path_to_binary&gt;</code> to list classes, methods, fields, and constructors in the JSON format that validates against the JSON schema defined in <a href="/docs/reference-manual/native-image/assets/native-image-inspect-schema-v0.2.0.json"><code>native-image-inspect-schema-v0.2.0.json</code></a> (only available in Oracle GraalVM).</p>
 
-<p>The amount of data included is fairly minimal compared to the overall image size, however you can set the <code>-H:-IncludeMethodsData</code> option to disable the metadata emission.
+<p>The <code>native-image</code> builder, by default, includes metadata in the native executable which then enables the Inspect Tool to list the included methods.</p>
+
+<p>The amount of data included is fairly minimal compared to the overall size of the native executable, however you can set the <code>-H:-IncludeMethodData</code> option to disable the metadata emission.
 Images compiled with this option will not be able to be inspected by the tool.</p>
-
-<h2 id="software-bill-of-materials-sbom">Software Bill of Materials (SBOM)</h2>
-
-<p>Native Image can embed a Software Bill of Materials (SBOM) at build time to detect any libraries that may be susceptible to known security vulnerabilities.
-Native Image provides the <code>--enable-sbom</code> option to embed an SBOM into a native executable.</p>
-
-<blockquote>
-  <p>Note: Embedding a Software Bill of Materials (SBOM) is not available in GraalVM Community Edition. The feature is currently experimental.</p>
-</blockquote>
-
-<p>The tool is able to extract the compressed SBOM using an optional <code>--sbom</code> parameter accessible through <code>$JAVA_HOME/bin/native-image-inspect --sbom &lt;path_to_binary&gt;</code>.</p>
 
 <h3 id="further-reading">Further Reading</h3>
 
 <ul>
-  <li><a href="/reference-manual/native-image/debugging-and-diagnostics/">Debugging and Diagnostics</a></li>
+  <li><a href="/security-guide/native-image/sbom/">Software Bill of Materials (SBOM) in Native Image</a></li>
 </ul>
 
       </div>
@@ -96,7 +117,7 @@ Native Image provides the <code>--enable-sbom</code> option to embed an SBOM int
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -105,7 +126,7 @@ Native Image provides the <code>--enable-sbom</code> option to embed an SBOM int
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -129,19 +150,6 @@ Native Image provides the <code>--enable-sbom</code> option to embed an SBOM int
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

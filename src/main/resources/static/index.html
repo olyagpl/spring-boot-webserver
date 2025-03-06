@@ -43,36 +43,57 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
   <div class="row">
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
-      <h1 id="graalvm-220-documentation">GraalVM for JDK 20 Documentation</h1>
+      <h1 id="graalvm-24-documentation">GraalVM for JDK 24 Documentation</h1>
 
 <h3 id="overview">Overview</h3>
 <ul>
-    <li><a href="docs/introduction/index.html">Introduction</a></li>
-    <li><a href="https://www.graalvm.org/release-notes/JDK_20/" target="_blank">Release Notes</a></li>
+    <li><a href="introduction/index.html">Introduction</a></li>
+    <li><a href="https://www.graalvm.org/release-notes/JDK_24/" target="_blank">Release Notes</a></li>
 </ul>
 
 <h3 id="getting-started">Getting Started</h3>
 <ul>
-    <li><a href="docs/getting-started/index.html">Getting Started with GraalVM</a>
+    <li><a href="getting-started/index.html">Getting Started with GraalVM</a>
     <ul>
-        <li><a href="docs/getting-started/linux/index.html">Linux</a></li>
-        <li><a href="docs/getting-started/macos/index.html">macOS</a></li>
-        <li><a href="docs/getting-started/windows/index.html">Windows</a></li>
+        <li><a href="getting-started/linux/index.html">Linux</a></li>
+        <li><a href="getting-started/macos/index.html">macOS</a></li>
+        <li><a href="getting-started/windows/index.html">Windows</a></li>
     </ul>
   </li>
-  <li><a href="docs/getting-started/container-images/index.html">Using Container Images</a></li>
+  <li><a href="getting-started/container-images/index.html">Using Container Images</a></li>
 </ul>
 
 <h3 id="native-image">Native Image</h3>
@@ -82,9 +103,10 @@
   <li><a href="reference-manual/native-image/overview/Build-Overview/index.html">Build Overview</a>
     <ul>
       <li><a href="reference-manual/native-image/overview/BuildOutput/index.html">Build Output</a></li>
+      <li><a href="reference-manual/native-image/overview/build-report/index.html">Build Report</a></li>
       <li><a href="reference-manual/native-image/overview/BuildConfiguration/index.html">Build Configuration</a></li>
-      <li><a href="reference-manual/native-image/overview/BuildOptions/index.html">Build Options</a></li>
-      <li><a href="reference-manual/native-image/overview/HostedvsRuntimeOptions/index.html">Native Image Hosted and Runtime Options</a></li>
+      <li><a href="reference-manual/native-image/overview/Bundles/index.html">Native Image Bundles</a></li>
+      <li><a href="reference-manual/native-image/overview/BuildOptions/index.html">Command-line Options</a></li>
     </ul>
   </li>
   <li><a href="reference-manual/native-image/metadata/index.html">Reachability Metadata</a>
@@ -98,6 +120,16 @@
     <ul>
       <li><a href="reference-manual/native-image/optimizations-and-performance/ClassInitialization/index.html">Class Initialization</a></li>
       <li><a href="reference-manual/native-image/optimizations-and-performance/MemoryManagement/index.html">Memory Management</a></li>
+      <li><a href="reference-manual/native-image/optimizations-and-performance/PGO/index.html">Profile-Guided Optimization</a>
+        <ul>
+            <li><a href="reference-manual/native-image/optimizations-and-performance/PGO/basic-usage/index.html">Basic Usage of Profile-Guided Optimization</a></li>
+            <li><a href="reference-manual/native-image/optimizations-and-performance/PGO/build-reports/index.html">Inspecting a Profile in a Build Report</a></li>
+            <li><a href="reference-manual/native-image/optimizations-and-performance/PGO/LCOV/index.html">Making Sense of PGO Reports Using LCOV</a></li>
+            <li><a href="reference-manual/native-image/optimizations-and-performance/PGO/merging-profiles/index.html">Merging Profiles from Multiple Sources</a></li>
+            <li><a href="reference-manual/native-image/optimizations-and-performance/PGO/profile-quality/index.html">Tracking Profile Quality</a></li>
+            <li><a href="reference-manual/native-image/optimizations-and-performance/PGO/faq/index.html">PGO Frequently Asked Questions</a></li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li><a href="reference-manual/native-image/debugging-and-diagnostics/index.html">Debugging and Diagnostics</a>
@@ -105,16 +137,16 @@
       <li><a href="reference-manual/native-image/debugging-and-diagnostics/DebugInfo/index.html">Debug Info Feature</a></li>
       <li><a href="reference-manual/native-image/debugging-and-diagnostics/InspectTool/index.html">Inspection Tool</a></li>
       <li><a href="reference-manual/native-image/debugging-and-diagnostics/JFR/index.html">JDK Flight Recorder (JFR)</a></li>
+      <li><a href="reference-manual/native-image/debugging-and-diagnostics/NMT/index.html">Native Memory Tracking (NMT) with Native Image</a></li>
+      <li><a href="reference-manual/native-image/debugging-and-diagnostics/perf-profiler/index.html">Linux Perf Profiler Support in Native Image</a></li>
       <li><a href="reference-manual/native-image/debugging-and-diagnostics/StaticAnalysisReports/index.html">Points-to Analysis Reports</a></li>
     </ul>
   </li>
   <li><a href="reference-manual/native-image/dynamic-features/index.html">Dynamic Features of Java</a>
     <ul>
       <li><a href="reference-manual/native-image/dynamic-features/CertificateManagement/index.html">Certificate Management</a></li>
-      <li><a href="reference-manual/native-image/dynamic-features/DynamicProxy/index.html">Dynamic Proxy</a></li>
       <li><a href="reference-manual/native-image/dynamic-features/JNI/index.html">Java Native Interface (JNI)</a></li>
       <li><a href="reference-manual/native-image/dynamic-features/JCASecurityServices/index.html">JCA Security Services</a></li>
-      <li><a href="reference-manual/native-image/dynamic-features/Reflection/index.html">Reflection in Native Image</a></li>
       <li><a href="reference-manual/native-image/dynamic-features/URLProtocols/index.html">URL Protocols</a></li>
     </ul>
   </li>
@@ -122,6 +154,7 @@
     <ul>
       <li><a href="reference-manual/native-image/native-code-interoperability/C-API/index.html">Native Image C API</a></li>
       <li><a href="reference-manual/native-image/native-code-interoperability/JNIInvocationAPI/index.html">JNI Invocation API</a></li>
+      <li><a href="reference-manual/native-image/native-code-interoperability/foreign-interface/index.html">Foreign Function and Memory API in Native Image</a></li>
     </ul>
   </li>
   <li><a href="reference-manual/native-image/LLVMBackend/index.html">LLVM Backend for Native Image</a></li>
@@ -130,48 +163,50 @@
 <h3 id="reference-manuals">Reference Manuals</h3>
 <ul>
 
-  <li><a href="reference-manual/java/index.html">Java and JVM</a>
+  <li><a href="reference-manual/java/index.html">GraalVM as a Java Virtual Machine</a>
     <ul>
         <li><a href="reference-manual/java/compiler/index.html">Graal Compiler</a></li>
-        <li><a href="reference-manual/java/options/index.html">Compiler Configuration on JVM</a></li>
-        <li><a href="reference-manual/java/operations/index.html">JVM Operations Manual</a></li>
+        <li><a href="reference-manual/java/options/index.html">Graal JIT Compiler Configuration on JVM</a></li>
+        <li><a href="reference-manual/java/operations/index.html">Graal JIT Compiler Operations Manual</a></li>
     </ul>
   </li>
 
-  <li><a href="reference-manual/graalvm-updater/index.html">GraalVM Updater</a></li>
-
-  <li><a href="reference-manual/languages/index.html">Runtime for Different Languages</a>
+  <li><a href="reference-manual/languages/index.html">Graal Languages</a>
     <ul>
 
-      <li><a href="reference-manual/java-on-truffle/index.html">Java on Truffle (Espresso)</a>
+      <li><a href="reference-manual/espresso/index.html">Espresso</a>
         <ul>
-            <li><a href="reference-manual/java-on-truffle/interoperability/index.html">Interoperability with Truffle Languages</a></li>
-            <li><a href="reference-manual/java-on-truffle/implementation/index.html">Implementation Details</a></li>
-            <li><a href="reference-manual/java-on-truffle/hotswap/index.html">Enhanced HotSwap</a></li>
-            <li><a href="reference-manual/java-on-truffle/demos/index.html">Demo Applications</a></li>
-            <li><a href="reference-manual/java-on-truffle/faq/index.html">Frequently Asked Questions</a></li>
+            <li><a href="reference-manual/espresso/interoperability/index.html">Interoperability with Truffle Languages</a></li>
+            <li><a href="reference-manual/espresso/implementation/index.html">Implementation Details</a></li>
+            <li><a href="reference-manual/espresso/hotswap/index.html">Enhanced HotSwap</a></li>
+            <li><a href="reference-manual/espresso/demos/index.html">Demo Applications</a></li>
+            <li><a href="reference-manual/espresso/faq/index.html">Frequently Asked Questions</a></li>
         </ul>
       </li>
 
-      <li><a href="reference-manual/js/index.html">JavaScript and Node.js (GraalJS)</a>
+      <li><a href="reference-manual/js/index.html">GraalJS</a>
         <ul>
-            <li><a href="reference-manual/js/NodeJSvsJavaScriptContext/index.html">Differences Between Node.js and Java Embeddings</a></li>
-            <li><a href="reference-manual/js/JavaScriptCompatibility/index.html">JavaScript Compatibility</a></li>
-            <li><a href="reference-manual/js/JavaInteroperability/index.html">Java Interoperability</a></li>
-            <li><a href="reference-manual/js/NashornMigrationGuide/index.html">Migration Guide from Nashorn to GraalVM JavaScript</a></li>
-            <li><a href="reference-manual/js/RhinoMigrationGuide/index.html">Migration Guide from Rhino to GraalVM JavaScript</a></li>
-            <li><a href="reference-manual/js/Multithreading/index.html">Multithreading</a></li>
             <li><a href="reference-manual/js/NodeJS/index.html">Node.js Runtime</a></li>
-            <li><a href="reference-manual/js/Options/index.html">Options</a></li>
-            <li><a href="reference-manual/js/OperatorOverloading/index.html">Operator Overloading</a></li>
-            <li><a href="reference-manual/js/RunOnJDK/index.html">Run GraalVM JavaScript on a Stock JDK</a></li>
-            <li><a href="reference-manual/js/ScriptEngine/index.html">ScriptEngine Implementation</a></li>
+            <li><a href="reference-manual/js/JavaInteroperability/index.html">Java Interoperability</a></li>
+            <li><a href="reference-manual/js/JavaScriptCompatibility/index.html">GraalJS Compatibility</a></li>
             <li><a href="reference-manual/js/Modules/index.html">Using JavaScript Modules and Packages</a></li>
+            <li><a href="reference-manual/js/Multithreading/index.html">Multithreading</a></li>
+            <li><a href="reference-manual/js/NashornMigrationGuide/index.html">Migration Guide from Nashorn to GraalJS</a></li>
+            <li><a href="reference-manual/js/RhinoMigrationGuide/index.html">Migration Guide from Rhino to GraalJS</a></li>
+            <li><a href="reference-manual/js/NodeJSvsJavaScriptContext/index.html">Differences Between Node.js and Java Embeddings</a></li>
+            <li><a href="reference-manual/js/Options/index.html">Options</a></li>
+            <li><a href="reference-manual/js/RunOnJDK/index.html">Run GraalJS on a Stock JDK</a></li>
+            <li><a href="reference-manual/js/ScriptEngine/index.html">ScriptEngine Implementation</a></li>
+            <li><a href="reference-manual/js/OperatorOverloading/index.html">Operator Overloading</a></li>
             <li><a href="reference-manual/js/FAQ/index.html">Frequently Asked Questions</a></li>
         </ul>
       </li>
 
-      <li><a href="reference-manual/llvm/index.html">LLVM (Sulong)</a>
+      <li><a href="http://graalvm.org/python/docs/">GraalPy</a></li>
+
+      <li><a href="reference-manual/wasm/index.html">GraalWasm</li>
+
+      <li><a href="reference-manual/llvm/index.html">LLVM Languages</a>
         <ul>
             <li><a href="reference-manual/llvm/Compiling/index.html">Compiling Native Projects to LLVM Bitcode</a></li>
             <li><a href="reference-manual/llvm/NativeExecution/index.html">Interaction of GraalVM with Native Code</a></li>
@@ -179,28 +214,6 @@
             <li><a href="reference-manual/llvm/Debugging/index.html">Debugging</a></li>
             <li><a href="reference-manual/llvm/Compatibility/index.html">LLVM Compatibility</a></li>
             <li><a href="reference-manual/llvm/Options/index.html">LLI Command Options</a></li>
-        </ul>
-      </li>
-
-      <li><a href="reference-manual/python/index.html">GraalPython</a>
-        <ul>
-            <li><a href="reference-manual/python/Packages/index.html">Installing Supported Packages</a></li>
-            <li><a href="reference-manual/python/Interoperability/index.html">Interoperability</a></li>
-            <li><a href="reference-manual/python/ParserDetails/index.html">Python Code Parsing and pyc Files</a></li>
-            <li><a href="reference-manual/python/Jython/index.html">Jython Migration Guide</a></li>
-            <li><a href="reference-manual/python/Tooling/index.html">Tooling Support for Python</a></li>
-            <li><a href="reference-manual/python/FAQ/index.html">Frequently Asked Questions</a></li>
-        </ul>
-      </li>
-
-      <li><a href="reference-manual/r/index.html">FastR</a>
-        <ul>
-            <li><a href="reference-manual/r/Compatibility/index.html">Runtime Compatibility</a></li>
-            <li><a href="reference-manual/r/ExtensionsSupport/index.html">R Extensions Support</a></li>
-            <li><a href="reference-manual/r/Interoperability/index.html">Interoperability</a></li>
-            <li><a href="reference-manual/r/JavaInteroperability/index.html">Interoperability with Java</a></li>
-            <li><a href="reference-manual/r/ParallelExecution/index.html">Parallel Execution</a></li>
-            <li><a href="reference-manual/r/Performance/index.html">Runtime Performance</a></li>
         </ul>
       </li>
 
@@ -228,7 +241,6 @@
         </ul>
       </li>
 
-      <li><a href="reference-manual/wasm/index.html">WebAssembly (Wasm)</a></li>
     </ul>
   </li>
 
@@ -290,9 +302,9 @@
     </li>
 </ul>
 
-<h3 id="monitoring-and-debugging-tools">Tools for GraalVM Languages</h3>
+<h3 id="monitoring-and-debugging-tools">Tools for Graal Languages</h3>
 <ul>
-  <li><a href="tools/index.html">Tools for GraalVM Languages</a>
+  <li><a href="tools/index.html">Tools for Graal Languages</a>
     <ul>
         <li><a href="tools/visualvm/index.html">VisualVM</a></li>
         <li><a href="tools/graalvm-insight/index.html">GraalVM Insight</a></li>
@@ -301,7 +313,6 @@
         <li><a href="tools/chrome-debugger/index.html">Chrome Debugger</a></li>
         <li><a href="tools/dap/index.html">Debug Adapter Protocol</a></li>
         <li><a href="tools/igv/index.html">Ideal Graph Visualizer</a></li>
-        <li><a href="tools/vscode/graalvm-extension/index.html">Visual Studio Code: GraalVM Tools for Java</a></li>
     </ul>
   </li>
 </ul>
@@ -315,7 +326,7 @@
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -324,7 +335,7 @@
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -348,19 +359,6 @@
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -60,32 +81,26 @@
 
       <h1 id="ruby-managers-and-installers">Ruby Managers and Installers</h1>
 
-<p>If you have <a href="/reference-manual/ruby/InstallingGraalVM/">installed GraalVM</a>, it is recommended to add TruffleRuby to a Ruby manager.
-See
-<a href="#configuring-ruby-managers-for-the-full-graalvm-distribution">Configuring Ruby managers for the full GraalVM distribution</a> below.</p>
-
-<h2 id="installing-truffleruby-with-rvm-ruby-build-asdf-or-ruby-install">Installing TruffleRuby with <code>rvm</code>, <code>ruby-build</code>, <code>asdf</code> or <code>ruby-install</code></h2>
-
 <p>TruffleRuby is supported by the 3 major Ruby installers.</p>
 
-<h3 id="rvm"><code>rvm</code></h3>
+<h2 id="rvm"><code>rvm</code></h2>
 
 <p>Upgrade <code>rvm</code> to let <code>rvm</code> know about the latest TruffleRuby release:</p>
 
 <pre><code class="language-bash">rvm get head
 </code></pre>
 
-<p>Install the latest TruffleRuby standalone release with:</p>
+<p>Install the latest TruffleRuby Native Standalone release with:</p>
 
 <pre><code class="language-bash">rvm install truffleruby
 </code></pre>
 
-<p>You can also install the latest nightly standalone build of TruffleRuby with:</p>
+<p>You can also install the latest Native Standalone dev build of TruffleRuby with:</p>
 
 <pre><code class="language-bash">rvm install truffleruby-head
 </code></pre>
 
-<h3 id="ruby-build-and-rbenv"><code>ruby-build</code> and <code>rbenv</code></h3>
+<h2 id="ruby-build-and-rbenv"><code>ruby-build</code> and <code>rbenv</code></h2>
 
 <p>We assume you already have <a href="https://github.com/rbenv/ruby-build"><code>ruby-build</code></a> installed as a plugin for <a href="https://github.com/rbenv/rbenv"><code>rbenv</code></a>.</p>
 
@@ -102,36 +117,36 @@ See <a href="https://github.com/rbenv/ruby-build#upgrading"><code>ruby-build</co
 <pre><code class="language-bash">rbenv install --list
 </code></pre>
 
-<p>Then install the latest TruffleRuby standalone release with:</p>
+<p>Then install the latest TruffleRuby Native Standalone release with:</p>
 
 <pre><code class="language-bash">rbenv install truffleruby-[LATEST_VERSION]
 </code></pre>
 
-<p>You can also install the latest nightly standalone build of TruffleRuby with:</p>
+<p>You can also install the latest Native Standalone dev build of TruffleRuby with:</p>
 
 <pre><code class="language-bash">rbenv install truffleruby-dev
 </code></pre>
 
-<p>You can also install TruffleRuby+GraalVM with:</p>
+<p>You can also install the TruffleRuby JVM Standalone with:</p>
 
 <pre><code class="language-bash">rbenv install truffleruby+graalvm-[LATEST_VERSION] OR truffleruby+graalvm-dev
 </code></pre>
 
-<h3 id="asdf-with-asdf-ruby-plugin"><code>asdf</code> (with <code>asdf-ruby</code> plugin)</h3>
+<h2 id="asdf-with-asdf-ruby-plugin"><code>asdf</code> (with <code>asdf-ruby</code> plugin)</h2>
 
 <p>See https://github.com/asdf-vm/asdf-ruby for installing and updating <code>asdf-ruby</code>.</p>
 
-<p>You can install a TruffleRuby standalone release or nightly build with:</p>
+<p>You can install a TruffleRuby Native Standalone release or dev build with:</p>
 
 <pre><code class="language-bash">asdf install ruby truffleruby-VERSION OR truffleruby-dev
 </code></pre>
 
-<p>You can install TruffleRuby+GraalVM with:</p>
+<p>You can also install the TruffleRuby JVM Standalone with:</p>
 
 <pre><code class="language-bash">asdf install ruby truffleruby+graalvm-VERSION OR truffleruby+graalvm-dev
 </code></pre>
 
-<h3 id="ruby-install-and-chruby"><code>ruby-install</code> and <code>chruby</code></h3>
+<h2 id="ruby-install-and-chruby"><code>ruby-install</code> and <code>chruby</code></h2>
 
 <p>See https://github.com/postmodern/ruby-install#install for installing and updating <code>ruby-install</code>.</p>
 
@@ -145,19 +160,19 @@ Check your version with:</p>
 If it is older, you should update to the latest <code>ruby-install</code> (e.g. 0.8.4 is necessary for aarch64 support).
 Follow the <a href="https://github.com/postmodern/ruby-install#install">installation instructions</a>, since the steps for upgrading <code>ruby-install</code> are the same as the steps for installing it.</p>
 
-<p>Then install the latest TruffleRuby standalone release with:</p>
+<p>Then install the latest TruffleRuby Native Standalone release with:</p>
 
-<pre><code class="language-bash">ruby-install --latest
+<pre><code class="language-bash">ruby-install --update
 ruby-install truffleruby
 </code></pre>
 
-<p>You can also install TruffleRuby+GraalVM with:</p>
+<p>You can also install the TruffleRuby JVM Standalone with:</p>
 
 <pre><code class="language-bash">ruby-install truffleruby-graalvm
 </code></pre>
 
-<p><code>ruby-install</code> does not support installing nightly builds.
-Please use <code>ruby-build</code> (which also works with <code>chruby</code>) if you want to install nightly builds:</p>
+<p><code>ruby-install</code> does not support installing dev builds.
+Please use <code>ruby-build</code> (which also works with <code>chruby</code>) if you want to install dev builds:</p>
 
 <pre><code class="language-bash">ruby-build truffleruby-dev ~/.rubies/truffleruby-dev
 OR
@@ -165,61 +180,6 @@ ruby-build truffleruby+graalvm-dev ~/.rubies/truffleruby+graalvm-dev
 </code></pre>
 
 <p>There are also instructions on the <a href="https://github.com/postmodern/chruby/wiki/TruffleRuby">chruby wiki</a> if you prefer to install TruffleRuby manually.</p>
-
-<h2 id="configuring-ruby-managers-for-the-full-graalvm-distribution">Configuring Ruby Managers for the Full GraalVM Distribution</h2>
-
-<p>When <a href="/reference-manual/ruby/InstallingGraalVM/">installing GraalVM and Ruby</a>, it is recommended to add TruffleRuby to a Ruby manager for ease of use.</p>
-
-<p>Make sure you ran the post-install script <em>before</em> adding GraalVM to Ruby managers.</p>
-
-<p>Then follow these steps to integrate GraalVM with your Ruby manager.</p>
-
-<p>The first step is to find the TruffleRuby home.
-On macOS, run:</p>
-<pre><code class="language-bash">ruby_home=$(path/to/graalvm/Contents/Home/bin/ruby -e 'print RbConfig::CONFIG["prefix"]')
-</code></pre>
-
-<p>On Linux and other platforms, run:</p>
-<pre><code class="language-bash">ruby_home=$(path/to/graalvm/bin/ruby -e 'print RbConfig::CONFIG["prefix"]')
-</code></pre>
-
-<h3 id="rbenv"><code>rbenv</code></h3>
-
-<p>To add TruffleRuby to <code>rbenv</code>, create a symbolic link in the <code>versions</code> directory of <code>rbenv</code>:</p>
-
-<pre><code class="language-bash">ln -s "$ruby_home" "$RBENV_ROOT/versions/truffleruby"
-rbenv shell truffleruby
-ruby --version
-</code></pre>
-
-<h3 id="chruby"><code>chruby</code></h3>
-
-<p>To add TruffleRuby to <code>chruby</code>, create a symbolic link to the <code>$HOME/.rubies</code> directory:</p>
-
-<pre><code class="language-bash">ln -s "$ruby_home" "$HOME/.rubies/truffleruby"
-chruby truffleruby
-ruby --version
-</code></pre>
-
-<h3 id="rvm-1"><code>rvm</code></h3>
-
-<p><code>rvm</code> has a command for adding a precompiled Ruby to the list of available rubies:</p>
-
-<pre><code class="language-bash">rvm mount "$ruby_home" -n truffleruby
-rvm use ext-truffleruby
-ruby --version
-</code></pre>
-
-<h3 id="asdf-with-asdf-ruby-plugin-1"><code>asdf</code> (with <code>asdf-ruby</code> plugin)</h3>
-
-<p>To add TruffleRuby to <code>asdf</code>, create a symbolic link in the <code>.installs/ruby</code> directory.
-You also need to reshim:</p>
-
-<pre><code class="language-bash">ln -s "$ruby_home" "$HOME/.asdf/installs/ruby/truffleruby"
-asdf reshim ruby truffleruby
-asdf local ruby truffleruby
-ruby --version
-</code></pre>
 
 <h2 id="using-truffleruby-without-a-ruby-manager">Using TruffleRuby without a Ruby Manager</h2>
 
@@ -247,7 +207,7 @@ unset GEM_HOME GEM_PATH
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -256,7 +216,7 @@ unset GEM_HOME GEM_PATH
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -280,19 +240,6 @@ unset GEM_HOME GEM_PATH
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

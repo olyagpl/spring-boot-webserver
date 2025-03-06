@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,7 +77,6 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="truffle-approach-to-the-compilation-queue">Truffle Approach to the Compilation Queue</h1>
 
 <p>As of version 21.2.0 Truffle has a new approach to compilation queueing.
@@ -66,7 +86,7 @@ This document gives motivation and an overview of this approach.</p>
 
 <p>During execution of guest code each Truffle call target counts how many times it was executed as well as how many loop iterations happened during those executions (i.e. the target’s “call and loop count”).
 Once this counter reaches a certain threshold the call target is deemed “hot” and scheduled for compilation.
-In order to minimize the impact this has on the execution of the guest code the notion that the target should be compiled is made concrete as a <a href="https://github.com/oracle/graal/blob/master/compiler/src/jdk.internal.vm.compiler/src/org/graalvm/compiler/hotspot/CompilationTask.java">compilation task</a> and placed into a <a href="https://github.com/oracle/graal/blob/master/compiler/src/jdk.internal.vm.compiler/src/org/graalvm/compiler/truffle/runtime/BackgroundCompileQueue.java">compilation queue</a> to await compilation.
+In order to minimize the impact this has on the execution of the guest code the notion that the target should be compiled is made concrete as a <a href="https://github.com/oracle/graal/blob/master/truffle/src/com.oracle.truffle.runtime/src/com/oracle/truffle/runtime/CompilationTask.java">compilation task</a> and placed into a <a href="https://github.com/oracle/graal/blob/master/compiler/src/com.oracle.truffle.runtime/src/com/oracle/truffle/runtime/BackgroundCompileQueue.java">compilation queue</a> to await compilation.
 The Truffle runtime spawns several compiler threads (<code>--engine.CompilerThreads</code>) that take tasks from the queue and compile the specified call targets.</p>
 
 <p>The initial implementation of the compilation queue in Truffle was a straightforward FIFO queue.
@@ -100,10 +120,10 @@ Using a FIFO queue, we would compile the <code>lowUsage</code> function first, e
 
 <h2 id="traversing-compilation-queue">Traversing Compilation Queue</h2>
 
-<p>The new compilation queue in Truffle, colloquially called <a href="https://github.com/oracle/graal/blob/master/compiler/src/jdk.internal.vm.compiler/src/org/graalvm/compiler/truffle/runtime/TraversingBlockingQueue.java">“Traversing Compilation Queue”</a>, takes a more dynamic approach to selecting the order in which targets are compiled.
+<p>The new compilation queue in Truffle, colloquially called <a href="https://github.com/oracle/graal/blob/master/truffle/src/com.oracle.truffle.runtime/src/com/oracle/truffle/runtime/TraversingBlockingQueue.java">“Traversing Compilation Queue”</a>, takes a more dynamic approach to selecting the order in which targets are compiled.
 Every time a compiler thread requests the next compilation task the queue will traverse all the entries in the queue and pick the one with the highest priority.</p>
 
-<p>A task’s priority is <a href="https://github.com/oracle/graal/blob/master/compiler/src/jdk.internal.vm.compiler/src/org/graalvm/compiler/hotspot/CompilationTask.java#L209">determined based on several factors</a>.</p>
+<p>A task’s priority is <a href="https://github.com/oracle/graal/blob/master/truffle/src/com.oracle.truffle.runtime/src/com/oracle/truffle/runtime/CompilationTask.java#L209">determined based on several factors</a>.</p>
 
 <p>For starters, targets scheduled for <a href="https://medium.com/graalvm/multi-tier-compilation-in-graalvm-5fbc65f92402">first-tier compilation</a> (i.e. first-tier tasks) always have higher priority than second-tier tasks.
 The rational behind this is that performance difference between executing code in the interpreter and executing it in first-tier compiled code is much greater then the difference between tier-one and tier-two compiled code, meaning that we get more benefit from compiling these targets sooner.
@@ -130,7 +150,7 @@ This gives a priority boost to targets that are currently “very hot” when co
 This does not have a significant performance impact as long as the size of the queue remains reasonable.
 This means that in order to always choose the highest priority task in a reasonable about of time we need to ensure that the queue does not grow indefinitely.</p>
 
-<p>This is achieved by an approach we call <a href="https://github.com/oracle/graal/blob/master/compiler/src/jdk.internal.vm.compiler/src/org/graalvm/compiler/truffle/runtime/DynamicThresholdsQueue.java">“dynamic compilation thresholds”</a>.
+<p>This is achieved by an approach we call <a href="https://github.com/oracle/graal/blob/master/truffle/src/com.oracle.truffle.runtime/src/com/oracle/truffle/runtime/DynamicThresholdsQueue.java">“dynamic compilation thresholds”</a>.
 Simply put, dynamic compilation thresholds means that the compilation threshold (the one each call target’s call and loop count is compared against when determining whether to compile it) may change over time depending on the state of the queue.
 If the queue is overloaded we aim to increase the compilation thresholds to reduce the number of incoming compilation tasks, i.e. targets need to be “more hot” to get scheduled for compilation.
 On the other hand, if the queue is close to empty, we can reduce the compilation thresholds to allow more targets to get scheduled for compilation, i.e. the compilation threads are in danger of idling so let’s give them even “less hot” targets to compile.</p>
@@ -198,7 +218,7 @@ They can be disabled with <code>--engine.DynamicCompilationThresholds=false</cod
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -207,7 +227,7 @@ They can be disabled with <code>--engine.DynamicCompilationThresholds=false</cod
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -231,19 +251,6 @@ They can be disabled with <code>--engine.DynamicCompilationThresholds=false</cod
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

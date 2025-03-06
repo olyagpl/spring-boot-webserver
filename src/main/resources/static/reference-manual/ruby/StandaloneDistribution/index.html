@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -60,90 +81,7 @@
 
       <h1 id="standalone-distribution">Standalone Distribution</h1>
 
-<p>For details regarding the three ways to install TruffleRuby, see <a href="/reference-manual/ruby/#getting-started">Getting Started</a>.
-The recommended way is to install <a href="/reference-manual/ruby/InstallingGraalVM/">GraalVM</a> as it provides the most flexibility.
-However, you can also use what we call the standalone distribution of TruffleRuby, either via your Ruby manager/installer, or as a simple binary tarball.</p>
-
-<p>Releases of the standalone distribution are <a href="https://github.com/oracle/truffleruby/releases/latest">available on GitHub</a>.
-Nightly builds are <a href="https://github.com/ruby/truffleruby-dev-builder/releases/latest">also available</a>.</p>
-
-<p>The standalone distributions are the files:</p>
-<pre><code class="language-bash">truffleruby-VERSION-linux-amd64.tar.gz
-truffleruby-VERSION-macos-amd64.tar.gz
-</code></pre>
-
-<h2 id="testing-truffleruby-in-travisci">Testing TruffleRuby in TravisCI</h2>
-
-<p>TruffleRuby is now integrated in TravisCI.
-Just add <code>truffleruby</code> in the build matrix, such as:</p>
-
-<pre><code class="language-yaml">language: ruby
-rvm:
-  - 2.6.1
-  - truffleruby
-  - truffleruby-head
-</code></pre>
-
-<p>See <a href="https://docs.travis-ci.com/user/languages/ruby#truffleruby">the TravisCI documentation</a> for details.
-Please <a href="https://github.com/oracle/truffleruby/issues">report</a> any issue you might find.</p>
-
-<h2 id="testing-truffleruby-in-github-actions">Testing TruffleRuby in GitHub Actions</h2>
-
-<p>In GitHub Actions, you can easily setup TruffleRuby with <a href="https://github.com/ruby/setup-ruby">ruby/setup-ruby</a>:</p>
-
-<pre><code class="language-yaml">name: My workflow
-on: [push]
-jobs:
-  test:
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: [ 2.6, truffleruby, truffleruby-head ]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: $
-    - run: ruby -v
-</code></pre>
-
-<p>See the <a href="https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby">README</a> of that action for more documentation.</p>
-
-<h2 id="testing-truffleruby-in-ci">Testing TruffleRuby in CI</h2>
-
-<p>If you use another continuous integration system, simply follow these instructions to run TruffleRuby in CI: download and extract the archive, add it to <code>PATH</code>, and run the post-install script.</p>
-
-<h2 id="latest-release">Latest Release</h2>
-
-<p>Set <code>TRUFFLERUBY_VERSION</code> to the latest TruffleRuby version from <a href="https://github.com/oracle/truffleruby/releases/latest">GitHub releases</a>.</p>
-
-<pre><code class="language-bash">export TRUFFLERUBY_VERSION=&lt;desired_version&gt;
-curl -L https://github.com/oracle/truffleruby/releases/download/vm-$TRUFFLERUBY_VERSION/truffleruby-$TRUFFLERUBY_VERSION-linux-amd64.tar.gz | tar xz
-export PATH="$PWD/truffleruby-$TRUFFLERUBY_VERSION-linux-amd64/bin:$PATH"
-$PWD/truffleruby-$TRUFFLERUBY_VERSION-linux-amd64/lib/truffle/post_install_hook.sh
-ruby -v
-</code></pre>
-
-<h2 id="latest-nightly-build">Latest Nightly Build</h2>
-
-<p>Here are the instructions for manually installing the latest nightly build:</p>
-
-<pre><code class="language-bash">curl -L https://github.com/ruby/truffleruby-dev-builder/releases/latest/download/truffleruby-head-ubuntu-18.04.tar.gz | tar xz
-export PATH="$PWD/truffleruby-head/bin:$PATH"
-$PWD/truffleruby-head/lib/truffle/post_install_hook.sh
-ruby -v
-</code></pre>
-
-<h2 id="rubygems-configuration">RubyGems Configuration</h2>
-
-<p>Note that you also need to ensure <code>GEM_HOME</code> and <code>GEM_PATH</code> are not set, so TruffleRuby uses the correct <code>GEM_HOME</code> and <code>GEM_PATH</code>.
-See <a href="/reference-manual/ruby/RubyManagers/#using-truffleruby-without-a-ruby-manager">Using TruffleRuby without a Ruby manager</a>
-for details.</p>
-
-<h2 id="dependencies">Dependencies</h2>
-
-<p><a href="/reference-manual/ruby/#dependencies">TruffleRuby’s dependencies</a> need to be installed for TruffleRuby to run correctly.</p>
+<p>This documentation has moved to <a href="/reference-manual/ruby/InstallingTruffleRuby/">Installing TruffleRuby</a>.</p>
 
       </div>
   </div>
@@ -157,7 +95,7 @@ for details.</p>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -166,7 +104,7 @@ for details.</p>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -190,19 +128,6 @@ for details.</p>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

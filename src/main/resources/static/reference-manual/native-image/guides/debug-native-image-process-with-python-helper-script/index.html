@@ -1,0 +1,224 @@
+<div class="container-fluid container-fluid--custom-sm light-back">
+  <div class="row">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1 top-layout-indent">
+      <br>
+      <a href='/reference-manual/native-image/guides/' class="link-back"><i>&#9664;</i>Back</a>
+      <h1 id="debug-native-executables-with-a-python-helper-script">Debug Native Executables with a Python Helper Script</h1>
+
+<p>Additionally to the <a href="/reference-manual/native-image/guides/debug-native-image-process/">GDB debugging</a>, you can debug a <code>native-image</code> process using a Python helper script, <em>gdb-debughelpers.py</em>.
+The <a href="https://sourceware.org/gdb/current/onlinedocs/gdb/Python.html">GDB Python API</a> is used to provide a reasonably good experience for debugging native executables or shared libraries.
+It requires GDB with Python support.
+The debugging extension is tested against GDB 14.2 and supports the new debuginfo generation introduced in GraalVM for JDK 17 and later.</p>
+
+<blockquote>
+  <p>Note: The <em>gdb-debughelpers.py</em> file does not work with versions older than version 14.2 of <code>gdb</code> or versions older than GraalVM for JDK 17.</p>
+</blockquote>
+
+<p>The Python script <em>gdb-debughelpers.py</em> can be found in the <em>&lt;GRAALVM_HOME&gt;/lib/svm/debug</em> directory.
+If debuginfo generation is enabled (see <a href="/reference-manual/native-image/guides/debug-native-image-process/#build-a-native-executable-with-debug-information">Build a Native Executable with Debug Information</a>), the script is copied to the build directory.
+The <code>native-image</code> tool adds the debugging section <code>.debug_gdb_scripts</code> to the debug info file, which causes GDB to automatically load <em>gdb-debughelpers.py</em> from the current working directory.</p>
+
+<p>For <a href="https://sourceware.org/gdb/current/onlinedocs/gdb/Auto_002dloading-safe-path.html">security reasons</a>
+the first time GDB encounters a native executable or shared library that requests a specific Python file to be loaded it will print a warning:</p>
+
+<blockquote>
+  <pre><code>warning: File "&lt;CWD&gt;/gdb-debughelpers.py" auto-loading has been declined by your `auto-load safe-path' set to "$debugdir:$datadir/auto-load".
+
+To enable execution of this file add
+        add-auto-load-safe-path &lt;CWD&gt;/gdb-debughelpers.py
+line to your configuration file "&lt;HOME&gt;/.gdbinit".
+To completely disable this security protection add
+        add-auto-load-safe-path /
+line to your configuration file "&lt;HOME&gt;/.gdbinit".
+For more information about this security protection see the
+"Auto-loading safe path" section in the GDB manual.  E.g., run from the shell:
+        info "(gdb)Auto-loading safe path"
+</code></pre>
+</blockquote>
+
+<p>To solve this, either add the current working directory to <em>~/.gdbinit</em> as follows:</p>
+
+<pre><code>echo "add-auto-load-safe-path &lt;CWD&gt;/gdb-debughelpers.py" &gt;&gt; ~/.gdbinit
+</code></pre>
+
+<p>or pass the path as a command line argument to <code>gdb</code>:</p>
+
+<pre><code>gdb -iex "set auto-load safe-path &lt;CWD&gt;/gdb-debughelpers.py" &lt;binary-name&gt;
+</code></pre>
+
+<p>Both enable GDB to auto-load <em>gdb-debughelpers.py</em> from the current working directory.</p>
+
+<p>Auto-loading is the recommended way to provide the script to GDB.
+However, it is possible to manually load the script from GDB explicitly with:</p>
+
+<pre><code>(gdb) source gdb-debughelpers.py
+</code></pre>
+
+<h2 id="pretty-printing-support">Pretty Printing Support</h2>
+
+<p>Loading <em>gdb-debughelpers.py</em> registers a new pretty printer to GDB, which adds an extra level of convenience for debugging native executables or shared libraries.
+This pretty printer handles the printing of Java Objects, Arrays, Strings, and Enums for debugging native executables or shared libraries.
+If the Java application uses <code>@CStruct</code> and <code>@CPointer</code> annotations to access C data structures, the pretty printer will also try to print them as if they were Java data structures.
+If the C data structures cannot be printed by the pretty printer, printing is performed by GDB.</p>
+
+<p>The pretty printer also prints of the primitive value of a boxed primitive (instead of a Java Object).</p>
+
+<p>Whenever printing is done via the <code>p</code> alias of the <code>print</code> command the pretty printer intercepts that call to perform type casts to the respective runtime types of Java Objects.
+This also applies for auto-completion when using the <code>p</code> alias.
+This means that if the static type is different to the runtime type, the <code>print</code> command uses the static type, which leaves the user to discover the runtime type and typecast it.
+Additionally, the <code>p</code> alias understands Java field and array access and function calls for Java Objects.</p>
+
+<h4 id="limitations">Limitations</h4>
+
+<p>The <code>print</code> command still uses its default implementation, as there is no way to overwrite it, while still keeping the capability of the default <code>print</code> command.
+Overriding would cause printing non-Java Objects to not work properly.
+Therefore, only the <code>p</code> alias for the <code>print</code> command is overwritten by the pretty printer, such that the user can still make use of the default GDB <code>print</code> command.</p>
+
+<h3 id="options-to-control-the-pretty-printer-behavior">Options to Control the Pretty Printer Behavior</h3>
+
+<p>In addition to the enhanced <code>p</code> alias, <em>gdb-debughelpers.py</em> introduces some GDB parameters to customize the behavior of the pretty printer.
+Parameters in GDB can be controlled with <code>set &lt;param&gt; &lt;value&gt;</code> and <code>show &lt;param&gt;</code> commands, and thus integrate with GDB’s customization options.</p>
+
+<ul>
+  <li>
+    <h4 id="svm-print-onoff">svm-print on/off</h4>
+  </li>
+</ul>
+
+<p>Use this command to enable/disable the pretty printer.
+This also resets the <code>print</code> command alias <code>p</code> to its default behavior.
+Alternatively pretty printing can be suppressed with the
+<a href="https://sourceware.org/gdb/current/onlinedocs/gdb/Output-Formats.html"><code>raw</code> printing option of GDB’s <code>print</code> command</a>:</p>
+
+<pre><code>(gdb) show svm-print
+The current value of 'svm-print' is "on".
+
+(gdb) print str
+$1 = "string"
+
+(gdb) print/r str
+$2 = (java.lang.String *) 0x7ffff689d2d0
+
+(gdb) set svm-print off
+1 printer disabled
+1 of 2 printers enabled
+
+(gdb) print str
+$3 = (java.lang.String *) 0x7ffff689d2d0
+</code></pre>
+
+<ul>
+  <li>
+    <h4 id="svm-print-string-limit-int">svm-print-string-limit &lt;int&gt;</h4>
+  </li>
+</ul>
+
+<p>Customizes the maximum length for pretty printing a Java String.
+The default value is <code>200</code>.
+Set to <code>-1</code> or <code>unlimited</code> for unlimited printing of a Java String.
+This does not change the limit for a C String, which can be controlled with GDB’s <code>set print characters</code> command.</p>
+
+<ul>
+  <li>
+    <h4 id="svm-print-element-limit-int">svm-print-element-limit &lt;int&gt;</h4>
+  </li>
+</ul>
+
+<p>Customizes the maximum number of elements for pretty printing a Java Array, ArrayList, and HashMap.
+The default value is <code>10</code>.
+Set to <code>-1</code> or <code>unlimited</code> to print an unlimited number of elements.
+This does not change the limit for a C array, which can be controlled with GDB’s <code>set print elements</code> command.
+However, GDB’s parameter <code>print elements</code> is the upper bound for <code>svm-print-element-limit</code>.</p>
+
+<ul>
+  <li>
+    <h4 id="svm-print-field-limit-int">svm-print-field-limit &lt;int&gt;</h4>
+  </li>
+</ul>
+
+<p>Customizes the maximum number of elements for pretty printing fields of a Java Object.
+The default value is <code>50</code>.
+Set to <code>-1</code> or <code>unlimited</code> to print an unlimited number of fields.
+GDB’s parameter <code>print elements</code> is the upper bound for <code>svm-print-field-limit</code>.</p>
+
+<ul>
+  <li>
+    <h4 id="svm-print-depth-limit-int">svm-print-depth-limit &lt;int&gt;</h4>
+  </li>
+</ul>
+
+<p>Customizes the maximum depth of recursive pretty printing.
+The default value is <code>1</code>.
+The children of direct children are printed (a sane default to make contents of boxed values visible).
+Set to <code>-1</code> or <code>unlimited</code> to print unlimited depth.
+GDB’s parameter <code>print max-depth</code> is the upper bound for <code>svm-print-depth-limit</code>.</p>
+
+<ul>
+  <li>
+    <h4 id="svm-use-hlrep-onoff">svm-use-hlrep on/off</h4>
+  </li>
+</ul>
+
+<p>Enables/disables pretty printing for higher level representations.
+It provides a more data-oriented view on some Java data structures with a known internal structure such as Lists or Maps.
+Currently supports ArrayList and HashMap.</p>
+
+<ul>
+  <li>
+    <h4 id="svm-infer-generics-int">svm-infer-generics &lt;int&gt;</h4>
+  </li>
+</ul>
+
+<p>Customizes the number of elements taken into account to infer the generic type of higher level representations.
+The default value is <code>10</code>.
+Set to <code>0</code> to not infer generic types and <code>-1</code> or <code>unlimited</code> to infer the generic type of all elements.</p>
+
+<ul>
+  <li>
+    <h4 id="svm-print-address-absoluteonoff">svm-print-address absolute/on/off</h4>
+  </li>
+</ul>
+
+<p>Enables/disables printing of addresses in addition to regular pretty printing.
+When <code>absolute</code> mode is used even compressed references are shown as absolute addresses.
+Printing addresses is disabled by default.</p>
+
+<ul>
+  <li>
+    <h4 id="svm-print-static-fields-onoff">svm-print-static-fields on/off</h4>
+  </li>
+</ul>
+
+<p>Enables/disables printing of static fields for a Java Object.
+Printing static fields is disabled by default.</p>
+
+<ul>
+  <li>
+    <h4 id="svm-complete-static-variables-onoff">svm-complete-static-variables on/off</h4>
+  </li>
+</ul>
+
+<p>Enables/disables auto-completion of static field members for the enhanced <code>p</code> alias.
+Auto-completion of static fields is enabled by default.</p>
+
+<ul>
+  <li>
+    <h4 id="svm-selfref-check-onoff">svm-selfref-check on/off</h4>
+  </li>
+</ul>
+
+<p>Enables/disables self-reference checks for data structures.
+The pretty printer detects a self-referential data structure and prevents further expansion to avoid endless recursion.
+Self-reference checks are enabled by default.
+For testing, this feature can be temporary disabled (usually you wouldn’t want to do this).</p>
+
+<h3 id="related-documentation">Related Documentation</h3>
+
+<ul>
+  <li><a href="/reference-manual/native-image/debugging-and-diagnostics/DebugInfo/">Debug Info Feature</a></li>
+  <li><a href="/reference-manual/native-image/guides/debug-native-image-process/">Debug Native Executables with GDB</a></li>
+</ul>
+
+      </div>
+  </div>
+</div>

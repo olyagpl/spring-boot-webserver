@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,7 +77,6 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="chrome-debugger">Chrome Debugger</h1>
 
 <p>GraalVM supports debugging of guest language applications and provides a built-in implementation of the <a href="https://chromedevtools.github.io/devtools-protocol/">Chrome DevTools Protocol</a>.
@@ -73,19 +93,19 @@ var server = http.createServer(function (request, response) {
 
 server.listen(8000);
 
-console.log("Server running at http://localhost:8080/");
+console.log("Server running at http://localhost:8000/");
 </code></pre>
 
 <ol>
   <li>Save this program as <code>HelloWorld.js</code> and then run:
-    <pre><code class="language-shell">$JAVA_HOME/bin/node --inspect --jvm HelloWorld.js
+    <pre><code class="language-shell">$JAVA_HOME/bin/node --inspect HelloWorld.js
 Debugger listening on ws://127.0.0.1:9229/SBqxI5YIqtREaDrXkFr8hLE0HL1AfKx8TjkI8qPMq2s
 For help, see: https://www.graalvm.org/tools/chrome-debugger
-E.g. in Chrome open: devtools://devtools/bundled/js_app.html?ws=127.0.0.1:9229/SBqxI5YIqtREaDrXkFr8hLE0HL1AfKx8TjkI8qPMq2s
+For example, in Chrome open: devtools://devtools/bundled/js_app.html?ws=127.0.0.1:9229/SBqxI5YIqtREaDrXkFr8hLE0HL1AfKx8TjkI8qPMq2s
 </code></pre>
   </li>
   <li>
-    <p>Navigate to <code>http://localhost:8080/</code> in your browser to launch the node application.</p>
+    <p>Navigate to <code>http://localhost:8000/</code> in your browser to launch the node application.</p>
   </li>
   <li>
     <p>Open the <code>devtools:...</code> link in a separate Chrome browser tab.</p>
@@ -98,7 +118,7 @@ E.g. in Chrome open: devtools://devtools/bundled/js_app.html?ws=127.0.0.1:9229/S
 
 <p>Now you can inspect the stack, variables, evaluate variables, and selected expressions in a tooltip, and so on. By hovering your cursor over the <code>response</code> variable, for instance, you can inspect its properties, as seen in the screenshot below:</p>
 
-<p><img src="/docs/tools/img/ChromeInspector.png" alt="" /></p>
+<p><img src="/docs/tools/img/ChromeInspector.png" alt="Chrome Inspector" /></p>
 
 <p>Consult the <a href="https://developers.google.com/web/tools/chrome-devtools/javascript/reference">JavaScript Debugging Reference</a> for details on Chrome DevTools debugging features.</p>
 
@@ -134,7 +154,7 @@ Other languages such as R and Ruby can be debugged as easily as JavaScript, incl
 The paths are delimited by <code>:</code> on UNIX systems and by <code>;</code> on MS Windows.</li>
   <li><code>--inspect.Secure=(true|false)</code> when true, use TLS/SSL to secure the debugging protocol. Besides changing the WS
 (web socket) protocol to WSS, the HTTP endpoint that serves metadata about the debuggee
-is also changed to HTTPS. This is not compatible, e.g., with a
+is also changed to HTTPS. This is not compatible, with a
 <a href="chrome://inspect">chrome://inspect</a> page, which is not able to provide the debuggee
 information and launch the debugger. Launch debugging via the printed WSS URL directly. Use the standard <code>javax.net.ssl.*</code> system options to provide information about keystore with the TLS/SSL encryption keys, or the following options:
     <ul>
@@ -147,6 +167,7 @@ information and launch the debugger. Launch debugging via the printed WSS URL di
   <li><code>--inspect.WaitAttached=(true|false)</code> when true, no guest language source code is executed until the inspector client is attached. Unlike <code>--inspect.Suspend=true</code>, the execution is resumed right
 after the client is attached. This assures that no execution is missed by the
 inspector client. It is <code>false</code> by default.</li>
+  <li><code>--inspect.SuspensionTimeout</code> sets a timeout of a debugger suspension. The debugger session is disconnected after the timeout expires. The timeout value consists of a positive integer value followed by a chronological time unit. For example, ‘15m’ or ’10s’. Valid time units are ‘ms’ for milliseconds, ‘s’ for seconds, ‘m’ for minutes, ‘h’ for hours, and ‘d’ for days. There is no timeout set by default.</li>
 </ul>
 
 <h3 id="advanced-debug-options">Advanced Debug Options</h3>
@@ -197,7 +218,7 @@ class DebuggerSample {
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -206,7 +227,7 @@ class DebuggerSample {
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -230,19 +251,6 @@ class DebuggerSample {
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

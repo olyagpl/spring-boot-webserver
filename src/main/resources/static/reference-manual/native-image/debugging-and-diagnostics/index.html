@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,16 +77,18 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="debugging-and-diagnostics">Debugging and Diagnostics</h1>
 
 <p>Native Image provides utilities for debugging and inspecting the produced binary:</p>
 <ul>
-  <li>For debugging produced binaries and obtaining performance profile statistics, see <a href="/reference-manual/native-image/debugging-and-diagnostics/DebugInfo/">Debug Information</a></li>
-  <li>For generating heap dumps, see <a href="/reference-manual/native-image/guides/create-heap-dump/">Heap Dump Support</a></li>
-  <li>For JFR events recording, see <a href="/reference-manual/native-image/debugging-and-diagnostics/JFR/">JDK Flight Recorder (JFR)</a></li>
-  <li>For checking which methods were included in a native executable or a shared library, use the <a href="/reference-manual/native-image/debugging-and-diagnostics/InspectTool/">Inspection Tool</a></li>
-  <li>For an overview of static analysis results, see <a href="/reference-manual/native-image/debugging-and-diagnostics/StaticAnalysisReports/">Static Analysis Reports</a></li>
+  <li>For debugging produced binaries and obtaining performance profile statistics, see <a href="/reference-manual/native-image/debugging-and-diagnostics/DebugInfo/">Debug Information</a>.</li>
+  <li>For generating heap dumps, see <a href="/reference-manual/native-image/guides/create-heap-dump/">Heap Dump Support</a>.</li>
+  <li>For JFR events recording, see <a href="/reference-manual/native-image/debugging-and-diagnostics/JFR/">JDK Flight Recorder (JFR)</a>.</li>
+  <li>For checking which methods were included in a native executable or a shared library, use the <a href="/reference-manual/native-image/debugging-and-diagnostics/InspectTool/">Inspection Tool</a>.</li>
+  <li>For an overview of static analysis results, see <a href="/reference-manual/native-image/debugging-and-diagnostics/StaticAnalysisReports/">Static Analysis Reports</a>.</li>
+  <li>For performance analysis, see <a href="/reference-manual/native-image/debugging-and-diagnostics/perf-profiler/">Linux Perf Profiler Support in Native Image</a>.</li>
+  <li>For an overall insight regarding build phases and the contents of a native executable, use <a href="/reference-manual/native-image/overview/build-report/">Build Reports</a>.</li>
+  <li>For native memory tracking, see <a href="/reference-manual/native-image/debugging-and-diagnostics/NMT/">Native Memory Tracking (NMT)</a>.</li>
 </ul>
 
       </div>
@@ -77,7 +100,7 @@
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -86,7 +109,7 @@
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -110,19 +133,6 @@
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

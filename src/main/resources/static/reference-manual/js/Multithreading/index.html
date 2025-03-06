@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,7 +77,6 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="multithreading">Multithreading</h1>
 
 <p>Running JavaScript on GraalVM supports multithreading.
@@ -65,8 +85,7 @@ Depending on the usage scenario, threads can be used to execute parallel JavaScr
 <h2 id="multithreading-with-java-and-javascript">Multithreading with Java and JavaScript</h2>
 
 <p>Multithreading is supported when running JavaScript in the context of Java interoperability.
-The basic model of multi-threaded execution supported by GraalVM is a “share-nothing” model that should be familiar to any JavaScript developer:</p>
-
+The basic model of multithreaded execution supported by GraalVM is a “share-nothing” model that should be familiar to any JavaScript developer:</p>
 <ol>
   <li>An arbitrary number of JavaScript <code>Context</code>s can be created, but they should be used by one thread at a time.</li>
   <li>Concurrent access to JavaScript objects is not allowed: any JavaScript object cannot be accessed by more than one thread at a time.</li>
@@ -77,9 +96,8 @@ The basic model of multi-threaded execution supported by GraalVM is a “share-n
 
 <h3 id="examples">Examples</h3>
 
-<p>The GraalVM JavaScript <a href="https://github.com/graalvm/graaljs/tree/master/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading">unit tests</a> contain several examples of multi-threaded Java/JavaScript interactions.
+<p>The GraalJS <a href="https://github.com/graalvm/graaljs/tree/master/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading">unit tests</a> contain several examples of multithreaded Java/JavaScript interactions.
 The most notable ones describe how:</p>
-
 <ol>
   <li><a href="https://github.com/graalvm/graaljs/blob/master/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/ConcurrentAccess.java">Multiple <code>Context</code> objects can be executed in multiple threads</a>.</li>
   <li><a href="https://github.com/graalvm/graaljs/blob/master/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/SingleThreadAccess.java">JavaScript values created by one thread can be used from another thread when proper synchronization is used</a>.</li>
@@ -88,23 +106,11 @@ The most notable ones describe how:</p>
   <li><a href="https://github.com/graalvm/graaljs/blob/master/graal-js/src/com.oracle.truffle.js.test.threading/src/com/oracle/truffle/js/test/threading/SharedJavaObjects.java">Java objects can be accessed by multiple JavaScript threads, concurrently</a>.</li>
 </ol>
 
-<h2 id="multithreading-with-nodejs">Multithreading with Node.js</h2>
+<h3 id="related-documentation">Related Documentation</h3>
 
-<p>The basic multithreading model of GraalVM JavaScript applies to Node.js applications as well.
-In Node.js, a <a href="https://nodejs.org/api/worker_threads.html#worker_threads_worker_threads">Worker</a> thread can be created to execute JavaScript code in parallel, but JavaScript objects cannot be shared between Workers.
-On the contrary, a Java object created with GraalVM Java interoperability (e.g., using <code>Java.type()</code>) can be shared between Node.js Workers.
-This allows multi-threaded Node.js applications to share Java objects.</p>
-
-<h3 id="examples-1">Examples</h3>
-
-<p>The GraalVM Node.js <a href="https://github.com/graalvm/graaljs/tree/master/graal-nodejs/test/graal/unit">unit tests</a> contain several examples of multi-threaded Node.js applications.
-The most notable examples show how:</p>
-
-<ol>
-  <li><a href="https://github.com/graalvm/graaljs/blob/master/graal-nodejs/test/graal/unit/worker.js">Node.js worker threads can execute Java code</a>.</li>
-  <li><a href="https://github.com/graalvm/graaljs/blob/master/graal-nodejs/test/graal/unit/javaMessages.js">Java objects can be shared between Node.js worker threads</a>.</li>
-  <li><a href="https://github.com/graalvm/graaljs/blob/master/graal-nodejs/test/graal/unit/workerInteropPromises.js">JavaScript <code>Promise</code> objects can be used to <code>await</code> on messages from workers, using Java objects to bind promises to worker messages</a>.</li>
-</ol>
+<ul>
+  <li><a href="/reference-manual/js/JavaInteroperability/">Java Interoperability</a></li>
+</ul>
 
       </div>
   </div>
@@ -115,7 +121,7 @@ The most notable examples show how:</p>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -124,7 +130,7 @@ The most notable examples show how:</p>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -148,19 +154,6 @@ The most notable examples show how:</p>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

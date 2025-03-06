@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -66,7 +87,7 @@ The traces can be added into running application and customized on the fly to ex
 <p>The following examples will demonstrate the tracing capabilities with GraalVM Insight.
 To start, install the Jaeger’s client side instrumentation library for Node.js:</p>
 
-<pre><code class="language-bash">graalvm/bin/npm install jaeger-client@3.17.1
+<pre><code class="language-bash">./bin/npm install jaeger-client@3.17.1
 </code></pre>
 
 <p>Now you can use the <a href="https://github.com/opentracing/opentracing-javascript">OpenTracing API</a> provided by the <code>jaeger-client</code> module in your instrument <code>agent.js</code> via the <code>tracer</code> object (once it becomes available, it will discussed later in this guide):</p>
@@ -205,7 +226,7 @@ But, first of all, start the Jaeger server:</p>
 -p 5778:5778   -p 16686:16686   -p 14268:14268   -p 9411:9411 \
 jaegertracing/all-in-one:latest
 
-graalvm/bin/node --insight=agent.js server.js
+./bin/node --insight=agent.js server.js
 Providing Jaeger object to the agent
 agent: Jaeger tracer obtained
 Initializing Jaeger Tracer with RemoteReporter and ConstSampler(always)
@@ -224,7 +245,7 @@ agent: ready
 <p>This completes the guide how to enhance a plain Node.js application with tracing.
 The traces remain separated in its own <code>agent.js</code> file and can be applied at start time (demonstrated here) or <a href="/tools/graalvm-insight/embedding/">dynamically</a> when needed.</p>
 
-<h3 id="what-to-read-rext">What to Read Rext</h3>
+<h3 id="what-to-read-next">What to Read Next</h3>
 
 <p>To learn more about Insight and find some challenging tasks, go to the <a href="/tools/graalvm-insight/manual/">Insight Manual</a>.</p>
 
@@ -240,7 +261,7 @@ The traces remain separated in its own <code>agent.js</code> file and can be app
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -249,7 +270,7 @@ The traces remain separated in its own <code>agent.js</code> file and can be app
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -273,19 +294,6 @@ The traces remain separated in its own <code>agent.js</code> file and can be app
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

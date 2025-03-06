@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,12 +77,10 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="polyglot-programming">Polyglot Programming</h1>
 
 <ul>
   <li><a href="#running-polyglot-applications">Running Polyglot Applications</a></li>
-  <li><a href="#polyglot-launcher">Polyglot Launcher</a></li>
   <li><a href="#polyglot-options">Polyglot Options</a></li>
   <li><a href="#passing-options-for-language-launchers">Passing Options for Language Launchers</a></li>
   <li><a href="#passing-options-programmatically">Passing Options Programmatically</a></li>
@@ -87,17 +106,8 @@ For more details, proceed to the <a href="http://dx.doi.org/10.1145/2816707.2816
 <p>The following examples are designed to get you started with a basic polyglot application.
 Select a section for your <em>Start Language</em> and then select a tab for the <em>Target Language</em>.</p>
 
-<p>Ensure you set up GraalVM before you begin.</p>
-
-<p>The below examples work:</p>
-<ul>
-  <li>on a JVM, by passing <code>--polyglot --jvm</code>.</li>
-  <li>on native launchers with <code>--polyglot</code> (e.g., <code>js --polyglot</code>).
-It might be required to <a href="/reference-manual/graalvm-updater/#rebuild-images">rebuild images</a> to access languages installed with <code>gu</code>.</li>
-  <li>with native executables (e.g., <code>native-image --language:js</code>).</li>
-</ul>
-
-<p>For native launchers and native executables using Java as a Target Language and accessing classes other than Java arrays, it is required to recompile the image and provide a <a href="/reference-manual/native-image/dynamic-features/Reflection/">reflection configuration file</a>.</p>
+<p>The below examples are expected to work equally from a JVM or native standalone distribution.
+For native launchers and native executables using Java as a Target Language and accessing classes other than Java arrays, it is required to recompile the image and provide a <a href="/reference-manual/native-image/metadata/#reflection">reflection configuration file</a>.</p>
 
 <p>Note: To start an application with LLVM as a Target Language, make sure to precompile the <em>polyglot.c</em> file provided below.</p>
 
@@ -462,9 +472,9 @@ It might be required to <a href="/reference-manual/graalvm-updater/#rebuild-imag
 
 <p>Run:</p>
 
-<pre><code class="language-shell">js --polyglot --jvm polyglot.js
+<pre><code class="language-shell">js polyglot.js
 42
-node --polyglot --jvm polyglot.js
+node polyglot.js
 42
 </code></pre>
 
@@ -837,7 +847,7 @@ node --polyglot --jvm polyglot.js
 
 <p>Run:</p>
 
-<pre><code class="language-shell">Rscript --polyglot --jvm polyglot.R
+<pre><code class="language-shell">Rscript polyglot.R
 [1] 42
 </code></pre>
 
@@ -1203,7 +1213,7 @@ node --polyglot --jvm polyglot.js
 
 <p>Run:</p>
 
-<pre><code class="language-shell">ruby --polyglot --jvm polyglot.rb
+<pre><code class="language-shell">ruby polyglot.rb
 42
 </code></pre>
 
@@ -1574,7 +1584,7 @@ node --polyglot --jvm polyglot.js
 
 <p>Run:</p>
 
-<pre><code class="language-shell">graalpy --polyglot --jvm polyglot.py
+<pre><code class="language-shell">graalpy polyglot.py
 42
 </code></pre>
 
@@ -2390,54 +2400,16 @@ java Polyglot
 </div>
 
 <p>The example C code has to be compiled to LLVM bitcode using the LLVM frontend such as <code>clang</code>.
-A user can use <code>clang</code> shipped with GraalVM by installing a pre-built LLVM toolchain support:</p>
+A user can use <code>clang</code> from the pre-built <a href="/reference-manual/llvm/#llvm-toolchain">LLVM toolchain shipped with the GraalVM LLVM runtime</a>:</p>
 
-<pre><code class="language-shell">gu install llvm-toolchain
-export LLVM_TOOLCHAIN=$(lli --print-toolchain-path)
+<pre><code class="language-shell">export LLVM_TOOLCHAIN=$(lli --print-toolchain-path)
 </code></pre>
 <p>Run:</p>
 
 <pre><code class="language-shell">$LLVM_TOOLCHAIN/clang polyglot.c -lgraalvm-llvm -o polyglot
-lli --polyglot polyglot
+lli polyglot
 42
 </code></pre>
-
-<h2 id="polyglot-launcher">Polyglot Launcher</h2>
-
-<p>With polyglot applications it is often impossible to decide what the primary language of an application is.
-Therefore, an experimental new launcher, called <code>polyglot</code>, has been added to GraalVM.
-For the moment, this launcher runs code for JavaScript, Ruby, and R without requiring the selection of a primary language.
-The polyglot launcher does not require the <code>--polyglot</code> option; it is enabled by default.</p>
-
-<p>This is how you can run a polyglot application by using the examples from above:</p>
-
-<pre><code class="language-shell">polyglot --jvm polyglot.js polyglot.R polyglot.rb
-</code></pre>
-
-<p>We have also included a basic experimental shell for multiple languages called the <em>Polyglot Shell</em>.
-It is useful to quickly test the interactivity of languages implemented with the <a href="/graalvm-as-a-platform/language-implementation-framework/">Truffle framework</a>.
-This is how you can start it:</p>
-
-<pre><code class="language-shell">polyglot --jvm --shell
-</code></pre>
-
-<p>If you have installed all optional languages packs to the core GraalVM installation, then the Polyglot Shell will look like:</p>
-<pre><code class="language-shell">GraalVM MultiLanguage Shell 22.2.0
-Copyright (c) 2013-2021, Oracle and/or its affiliates
-  Java version 22.2.0
-  JavaScript version 22.2.0
-  Python version 3.8.5
-  R version 4.0.3
-  Ruby version 3.0.3
-Usage:
-  Use Ctrl+n to switch language and Ctrl+d to exit.
-  Enter -usage to get a list of available commands.
-js&gt;
-</code></pre>
-
-<blockquote>
-  <p>Note: The <code>polyglot</code> launcher and the <em>Polyglot Shell</em> are experimental features in GraalVM.</p>
-</blockquote>
 
 <h2 id="polyglot-options">Polyglot Options</h2>
 
@@ -2459,7 +2431,7 @@ js&gt;
   </li>
 </ul>
 
-<h2 id="passing-options-for-language-launchers">Passing Options for Language Launchers</h2>
+<h2 id="passing-options-to-language-launchers">Passing Options to Language Launchers</h2>
 
 <p>Every language launcher has been extended with a set of so called <em>polyglot options</em>.
 Polyglot options allow users of any language launcher to access the options of other languages supported by GraalVM (implemented with the Truffle language implementation framework).
@@ -2550,6 +2522,12 @@ java -Dpolyglot.js.strict=true SystemPropertiesTest
   <p>Note: System properties are read once when the polyglot context is created. Subsequent changes have no effect.</p>
 </blockquote>
 
+<h3 id="related-documentation">Related Documentation</h3>
+
+<ul>
+  <li>Learn more about a guest and Java host language interoperability from the <a href="/reference-manual/embed-languages/">Embedding Languages documentation</a></li>
+</ul>
+
       </div>
   </div>
 </div>
@@ -2559,7 +2537,7 @@ java -Dpolyglot.js.strict=true SystemPropertiesTest
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -2568,7 +2546,7 @@ java -Dpolyglot.js.strict=true SystemPropertiesTest
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -2592,19 +2570,6 @@ java -Dpolyglot.js.strict=true SystemPropertiesTest
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

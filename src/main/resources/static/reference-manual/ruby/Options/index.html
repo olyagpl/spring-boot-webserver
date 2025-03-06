@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -64,6 +85,7 @@
 
 <pre><code class="language-shell">Usage: truffleruby [switches] [--] [programfile] [arguments]
   -0[octal]       specify record separator (\0, if no argument)
+                  (-00 for paragraph mode, -0777 for slurp mode)
   -a              autosplit mode with -n or -p (splits $_ into $F)
   -c              check syntax only
   -Cdirectory     cd to directory before executing your script
@@ -86,9 +108,11 @@
                   set warning level; 0=silence, 1=medium, 2=verbose
   -x[directory]   strip off text before #!ruby line and perhaps cd to directory
   --copyright     print the copyright
-  --enable={rubyopt|...}[,...], --disable={rubyopt|...}[,...]
+  --enable={rubyopt|...}[,...]
+  --disable={rubyopt|...}[,...]
                   enable or disable features. see below for available features
-  --external-encoding=encoding, --internal-encoding=encoding
+  --external-encoding=encoding
+  --internal-encoding=encoding
                   specify the default external or internal character encoding
   --backtrace-limit=num
                   limit the maximum length of backtrace
@@ -98,7 +122,9 @@
 
 Features:
   gems            rubygems (only for debugging, default: enabled)
+  error_highlight error_highlight (default: enabled)
   did_you_mean    did_you_mean (default: enabled)
+  syntax_suggest  syntax_suggest (default: enabled)
   rubyopt         RUBYOPT environment variable (default: enabled)
   frozen-string-literal
                   freeze all string literals (default: disabled)
@@ -106,6 +132,7 @@ Features:
 Warning categories:
   deprecated      deprecated features
   experimental    experimental features
+  performance     performance issues
 
 Runtime options:
   --polyglot                                   Run with all other guest languages accessible.
@@ -119,13 +146,14 @@ Runtime options:
   --help                                       Print this help message.
   --help:vm                                    Print options for the host VM.
   --help:engine                                Print engine options.
+  --help:compiler                              Print engine compiler options.
   --help:all                                   Print all options.
   --version:graalvm                            Print GraalVM version information and exit.
   --show-version:graalvm                       Print GraalVM version information and continue execution.
 
 Languages:
   [id]        [name]                  [website]
-  llvm        LLVM                    https://www.graalvm.org/22.1/reference-manual/llvm/
+  llvm        LLVM                    https://www.graalvm.org/dev/reference-manual/llvm/
   ruby        Ruby                    https://www.graalvm.org/ruby/
 
 Tools:
@@ -197,10 +225,9 @@ For example, <code>--vm.cp=lib.jar</code> or <code>--vm.classpath=lib.jar</code>
 
 <p>TruffleRuby needs to know where to locate files such as the standard library.
 These are stored in the TruffleRuby home directory.
-The Ruby home is always the one that the Truffle framework reports.</p>
+The Ruby home is always either the one that the Truffle framework reports or the extracted internal resources.</p>
 
-<p>If the Ruby home appears not to be correct, or is unset, a warning will be given but the program will continue and you will not be able to require standard libraries.
-You can tell TruffleRuby not to try to find a home at all using the <code>no-home-provided</code> option.</p>
+<p>If the Ruby home appears not to be correct, or is unset, a exception will be thrown.</p>
 
       </div>
   </div>
@@ -214,7 +241,7 @@ You can tell TruffleRuby not to try to find a home at all using the <code>no-hom
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -223,7 +250,7 @@ You can tell TruffleRuby not to try to find a home at all using the <code>no-hom
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -247,19 +274,6 @@ You can tell TruffleRuby not to try to find a home at all using the <code>no-hom
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

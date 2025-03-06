@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,7 +77,6 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="memory-management">Memory Management</h1>
 
 <p>A native image, when being executed, does not run on the Java HotSpot VM but on the runtime system provided with GraalVM.
@@ -68,11 +88,11 @@ When the heap becomes full, a garbage collection is triggered to reclaim memory 
 
 <p>For managing the Java heap, Native Image provides different garbage collector (GC) implementations:</p>
 <ul>
-  <li>The <strong>Serial GC</strong> is the default GC in GraalVM.
+  <li>The <strong>Serial GC</strong> is the default GC in GraalVM Native Image.
 It is optimized for low memory footprint and small Java heap sizes.</li>
-  <li>The <strong>G1 GC</strong> (not available in GraalVM Community Edition) is a multi-threaded GC that is optimized to reduce stop-the-world pauses and therefore improve latency, while achieving high throughput.
-To enable G1, specify the option <code>--gc=G1</code> at image build time.
-Currently, G1 can only be used in native images that are built on Linux for AMD64.</li>
+  <li>The <strong>G1 GC</strong> is a multithreaded GC that is optimized to reduce stop-the-world pauses and therefore improve latency, while achieving high throughput.
+To enable it, pass the option <code>--gc=G1</code> to the <code>native-image</code> builder.
+Currently, G1 Garbage Collector can be used with Native Image on the Linux AMD64 and AArch64 architectures. (Not available in GraalVM Community Edition.)</li>
   <li>The <strong>Epsilon GC</strong> (available with GraalVM 21.2 or later) is a no-op garbage collector that does not do any garbage collection and therefore never frees any allocated memory.
 The primary use case for this GC are very short running applications that only allocate a small amount of memory.
 To enable the Epsilon GC, specify the option <code>--gc=epsilon</code> at image build time.</li>
@@ -98,7 +118,7 @@ The exact values may depend on the system configuration and the used GC.</p>
 <ul>
   <li>The <em>maximum Java heap size</em> defines the upper limit for the size of the whole Java heap.
 If the Java heap is full and the GC is unable reclaim sufficient memory for a Java object allocation, the allocation will fail with the <code>OutOfMemoryError</code>.
-Note: The maximum heap size is only the upper limit for the Java heap and not necessarily the upper limit for the total amount of consumed memory, as Native Image places some data such as thread stacks, just-in-time compiled code, and internal data structures in memory that is separate from the Java heap.</li>
+Note: The maximum heap size is only the upper limit for the Java heap and not necessarily the upper limit for the total amount of consumed memory, as Native Image places some data such as thread stacks, just-in-time compiled code (for Truffle runtime compilation), and internal data structures in memory that is separate from the Java heap.</li>
   <li>The <em>minimum Java heap size</em> defines how much memory the GC may always assume as reserved for the Java heap, no matter how little of that memory is actually used.</li>
   <li>The <em>young generation size</em> determines the amount of Java memory that can be allocated without triggering a garbage collection.</li>
 </ul>
@@ -178,9 +198,9 @@ Decreasing this value will increase the number of full GCs, which can improve th
 <h2 id="g1-garbage-collector">G1 Garbage Collector</h2>
 
 <p>Oracle GraalVM also provides the Garbage-First (G1) garbage collector, which is based on the G1 GC from the Java HotSpot VM.
-Currently, G1 can only be used in native images that are built on Linux for AMD64.
-To enable it, pass the option <code>--gc=G1</code> to the native image builder.</p>
+Currently, G1 Garbage Collector can be used with Native Image on the Linux AMD64 and AArch64 architectures. (Not available in GraalVM Community Edition.)</p>
 
+<p>To enable it, pass the option <code>--gc=G1</code> to the <code>native-image</code> builder.</p>
 <pre><code class="language-shell"># Build a native image that uses the G1 GC with default settings
 native-image --gc=G1 HelloWorld
 </code></pre>
@@ -223,7 +243,7 @@ Here is a small subset of the options that can be specified when doing performan
 </ul>
 
 <pre><code class="language-shell"># Build and execute a native image that uses the G1 GC with a region size of 2MB and a maximum pause time goal of 100ms
-native-image --gc=G1 -H:G1RegionSize=2m -R:MaxGCPauseMillis=100 HelloWorld
+native-image --gc=G1 -H:G1HeapRegionSize=2m -R:MaxGCPauseMillis=100 HelloWorld
 ./helloworld
 
 # Execute the native image from above and override the maximum pause time goal
@@ -285,7 +305,7 @@ One common use-case is a <code>java.nio.DirectByteBuffer</code> that directly re
 
 <h2 id="printing-garbage-collections">Printing Garbage Collections</h2>
 
-<p>When executing a native image, the following options can be be used to print some information on garbage collection.
+<p>When executing a native image, the following options can be used to print some information on garbage collection.
 Which data is printed in detail depends on the used GC.</p>
 <ul>
   <li><code>-XX:+PrintGC</code> - print basic information for every garbage collection</li>
@@ -302,6 +322,7 @@ Which data is printed in detail depends on the used GC.</p>
 <h3 id="further-reading">Further Reading</h3>
 
 <ul>
+  <li><a href="/reference-manual/native-image/guides/optimize-memory-footprint/">Optimize Memory Footprint of a Native Executable</a></li>
   <li><a href="/reference-manual/native-image/overview/BuildConfiguration/#memory-configuration-for-native-image-build">Memory Configuration for Native Image Build</a></li>
 </ul>
 
@@ -314,7 +335,7 @@ Which data is printed in detail depends on the used GC.</p>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -323,7 +344,7 @@ Which data is printed in detail depends on the used GC.</p>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -347,19 +368,6 @@ Which data is printed in detail depends on the used GC.</p>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

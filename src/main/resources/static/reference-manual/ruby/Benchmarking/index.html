@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -66,9 +87,11 @@
 
 <p>We expect anyone publishing benchmark numbers about TruffleRuby to follow these guidelines.</p>
 
-<h3 id="use-truffleruby-ee">Use TruffleRuby EE</h3>
+<h3 id="use-oracle-graalvm">Use Oracle GraalVM</h3>
 
-<p>Use TruffleRuby EE, it is faster than CE overall and represents what TruffleRuby is capable of.</p>
+<p>Use <a href="/reference-manual/ruby/InstallingTruffleRuby/#oracle-graalvm-and-graalvm-community-edition">Oracle GraalVM</a> (before 23.0: GraalVM Enterprise Edition), it is faster than GraalVM Community Edition overall and represents what TruffleRuby is capable of.</p>
+
+<p>Use <code>ruby --version</code> to ensure that you are running Oracle GraalVM.</p>
 
 <h3 id="use-the-latest-release">Use the Latest Release</h3>
 
@@ -167,7 +190,7 @@ Use <code>Activity Monitor</code> before and after benchmarking to ensure there 
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -176,7 +199,7 @@ Use <code>Activity Monitor</code> before and after benchmarking to ensure there 
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -200,19 +223,6 @@ Use <code>Activity Monitor</code> before and after benchmarking to ensure there 
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

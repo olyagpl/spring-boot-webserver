@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="container-fluid container-fluid--custom-sm">
@@ -56,7 +77,6 @@
     <div class="col-12 col-sm-12 col-md-12 col-lg-10 offset-lg-1">
       <br>
       <a href="/" class="link-back"><i>&#9664;</i>Table of Contents</a>
-
       <h1 id="native-image-build-configuration">Native Image Build Configuration</h1>
 
 <p>Native Image supports a wide range of options to configure the <code>native-image</code> builder.</p>
@@ -184,7 +204,7 @@ It maxes out at 32GB by default and can be overwritten with, for example, <code>
 <code>-XX:GCTimeRatio=19</code> increases the goal of the total time for garbage collection to 5%, which is more throughput-oriented and reduces peak RSS.
 The build process also exits on the first <code>OutOfMemoryError</code> (<code>-XX:+ExitOnOutOfMemoryError</code>) to provide faster feedback in environments under a lot of memory pressure.</p>
 
-<p>By default, the <code>native-image</code> tool uses up to 32 threads (but not more than the number of processors available). For custom values, use the option <code>-H:NumberOfThreads=...</code>.</p>
+<p>By default, the <code>native-image</code> tool uses up to 32 threads (but not more than the number of processors available). For custom values, use the <code>--parallelism=...</code> option.</p>
 
 <p>For other related options available to the <code>native-image</code> tool, see the output from the command <code>native-image --expert-options-all</code>.</p>
 
@@ -196,22 +216,22 @@ However, you can prevent unwanted linking errors by specifying which classes are
 For that, use the <code>--link-at-build-time</code> option. 
 If the option is used in the right context (see below), you can specify required classes to link at build time without explicitly listing classes and packages.
 It is designed in a way that libraries can only configure their own classes, to avoid any side effects on other libraries.
-You can pass the option to the <code>native-image</code> tool on the command line, embed it in a <code>native-image.properties</code> file on the module-path or the classpath.</p>
+You can pass the option to the <code>native-image</code> tool on the command line, embed it in a <em>native-image.properties</em> file on the module path or the class path.</p>
 
 <p>Depending on how and where the option is used it behaves differently:</p>
 
 <ul>
-  <li>If you use <code>--link-at-build-time</code> without arguments, all classes in the scope are required to be fully defined. If used without arguments on command line, all classes will be treated as “link-at-build-time” classes. If used without arguments embedded in a <code>native-image.properties</code> file on the module-path, all classes of the module will be treated as “link-at-build-time” classes. If you use <code>--link-at-build-time</code> embedded in a <code>native-image.properties</code> file on the classpath, the following error will be thrown:
-    <pre><code class="language-shell">  Error: Using '--link-at-build-time' without args only allowed on module-path. 'META-INF/native-image/org.mylibrary/native-image.properties' in 'file:///home/test/myapp/MyLibrary.jar' not part of module-path.
+  <li>If you use <code>--link-at-build-time</code> without arguments, all classes in the scope are required to be fully defined. If used without arguments on command line, all classes will be treated as “link-at-build-time” classes. If used without arguments embedded in a <em>native-image.properties</em> file on the module path, all classes of the module will be treated as “link-at-build-time” classes. If you use <code>--link-at-build-time</code> embedded in a <em>native-image.properties</em> file on the class path, the following error will be thrown:
+    <pre><code>  Error: Using '--link-at-build-time' without args only allowed on module path. 'META-INF/native-image/org.mylibrary/native-image.properties' in 'file:///home/test/myapp/MyLibrary.jar' not part of module path.
 </code></pre>
   </li>
-  <li>If you use the  <code>--link-at-build-time</code> option with arguments, for example, <code>--link-at-build-time=foo.bar.Foobar,demo.myLibrary.Name,...</code>, the arguments should be fully qualified class names or package names. When used on the module-path or classpath (embedded in <code>native-image.properties</code> files), only classes and packages defined in the same JAR file can be specified. Packages for libraries used on the classpath need to be listed explicitly. To make this process easy, use the <code>@&lt;prop-values-file&gt;</code> syntax to generate a package list (or a class list) in a separate file automatically.</li>
+  <li>If you use the  <code>--link-at-build-time</code> option with arguments, for example, <code>--link-at-build-time=foo.bar.Foobar,demo.myLibrary.Name,...</code>, the arguments should be fully qualified class names or package names. When used on the module path or class path (embedded in <code>native-image.properties</code> files), only classes and packages defined in the same JAR file can be specified. Packages for libraries used on the class path need to be listed explicitly. To make this process easy, use the <code>@&lt;prop-values-file&gt;</code> syntax to generate a package list (or a class list) in a separate file automatically.</li>
 </ul>
 
 <p>Another handy option is <code>--link-at-build-time-paths</code> which allows to specify which classes are required to be fully defined at build time by other means.
 This variant requires arguments that are of the same type as the arguments passed via <code>-p</code> (<code>--module-path</code>) or <code>-cp</code> (<code>--class-path</code>):</p>
 
-<pre><code class="language-shell">--link-at-build-time-paths &lt;class search path of directories and zip/jar files&gt;
+<pre><code class="language-shell">--link-at-build-time-paths &lt;class search path of directories and ZIP/JAR files&gt;
 </code></pre>
 
 <p>The given entries are searched and all classes inside are registered as <code>--link-at-build-time</code> classes.
@@ -222,7 +242,7 @@ This option is only allowed to be used on command line.</p>
 <ul>
   <li><a href="/reference-manual/native-image/optimizations-and-performance/ClassInitialization/">Class Initialization in Native Image</a></li>
   <li><a href="/reference-manual/native-image/basics/">Native Image Basics</a></li>
-  <li><a href="/reference-manual/native-image/overview/BuildOptions/">Native Image Build Options</a></li>
+  <li><a href="/reference-manual/native-image/overview/Options/">Native Image Build Options</a></li>
   <li><a href="/reference-manual/native-image/overview/Build-Overview/">Native Image Build Overview</a></li>
   <li><a href="/reference-manual/native-image/metadata/">Reachability Metadata</a></li>
 </ul>
@@ -236,7 +256,7 @@ This option is only allowed to be used on command line.</p>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -245,7 +265,7 @@ This option is only allowed to be used on command line.</p>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -269,19 +289,6 @@ This option is only allowed to be used on command line.</p>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

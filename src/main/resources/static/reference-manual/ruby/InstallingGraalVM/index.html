@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -60,60 +81,7 @@
 
       <h1 id="using-truffleruby-with-graalvm">Using TruffleRuby with GraalVM</h1>
 
-<p><a href="http://graalvm.org/">GraalVM</a> is the platform on which TruffleRuby runs.</p>
-
-<p>Installing GraalVM enables you to run TruffleRuby both in the <code>--native</code> and <code>--jvm</code> <a href="/reference-manual/ruby/#truffleruby-runtime-configurations">runtime configurations</a>.</p>
-
-<h2 id="dependencies">Dependencies</h2>
-
-<p><a href="/reference-manual/ruby/#dependencies">TruffleRuby’s dependencies</a> need to be installed for TruffleRuby to run correctly.</p>
-
-<h2 id="community-edition-and-enterprise-edition">Community Edition and Enterprise Edition</h2>
-
-<p>GraalVM is available in a Community Edition, which is open-source, and an Enterprise Edition which has better performance and scalability.
-See <a href="https://www.graalvm.org/downloads">the website</a> for a comparison.</p>
-
-<h2 id="installing-the-base-image">Installing the Base Image</h2>
-
-<p>GraalVM starts with a base image which provides the platform for high-performance language runtimes.</p>
-
-<p>The Community Edition base image can be installed <a href="https://www.graalvm.org/downloads">from GitHub</a>, under an open source licence.</p>
-
-<p>The Enterprise Edition base image can be installed from <a href="https://www.oracle.com/downloads/graalvm-downloads.html">Oracle Downloads</a> page by accepting the Oracle License Agreement.</p>
-
-<p>Nightly builds of the GraalVM Community Edition are <a href="https://github.com/graalvm/graalvm-ce-dev-builds/releases">also available</a>.</p>
-
-<p>Whichever edition you choose, you will obtain a tarball which you can extract.
-There will be a <code>bin</code> directory (<code>Contents/Home/bin</code> on macOS) which you can add to your <code>$PATH</code> if you want to.</p>
-
-<h3 id="installing-with-asdf">Installing with asdf</h3>
-
-<p>Using <a href="https://github.com/asdf-vm/asdf">asdf</a> and <a href="https://github.com/halcyon/asdf-java">asdf-java</a> installation is as easy as
-<code>asdf install java graalvm-20.1.0+java11</code> (look up versions via <code>asdf list-all java | grep graalvm</code>).</p>
-
-<h2 id="installing-ruby-and-other-languages">Installing Ruby and Other Languages</h2>
-
-<p>After installing GraalVM you then need to install the Ruby language into it.
-This is done using the <code>gu</code> command.
-The Ruby package is the same for both editions of GraalVM and comes from GitHub:</p>
-<pre><code class="language-bash">gu install ruby
-</code></pre>
-
-<p>This command will show a message regarding running a post-install script.
-This is necessary to make the Ruby <code>openssl</code> C extension work with your system libssl.
-Please run that script now.
-The path of the script will be:</p>
-<pre><code class="language-bash">languages/ruby/lib/truffle/post_install_hook.sh
-</code></pre>
-
-<p>You can also download the latest Ruby component (<code>ruby-installable-...</code>) manually from <a href="https://github.com/oracle/truffleruby/releases/latest">GitHub</a> (CE)
-or from <a href="https://www.oracle.com/downloads/graalvm-downloads.html">Oracle Downloads</a> (EE).
-Then install it with <code>gu install --file path/to/ruby-installable-...</code>.</p>
-
-<h2 id="using-a-ruby-manager">Using a Ruby Manager</h2>
-
-<p>Inside GraalVM is a <code>jre/languages/ruby</code> or <code>languages/ruby</code> directory which has the usual structure of a Ruby implementation. It is recommended to add this directory to a Ruby manager.
-See <a href="/reference-manual/ruby/RubyManagers/">configuring Ruby managers</a> for more information.</p>
+<p>This documentation has moved to <a href="/reference-manual/ruby/InstallingTruffleRuby/">Installing TruffleRuby</a>.</p>
 
       </div>
   </div>
@@ -127,7 +95,7 @@ See <a href="/reference-manual/ruby/RubyManagers/">configuring Ruby managers</a>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -136,7 +104,7 @@ See <a href="/reference-manual/ruby/RubyManagers/">configuring Ruby managers</a>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -160,19 +128,6 @@ See <a href="/reference-manual/ruby/RubyManagers/">configuring Ruby managers</a>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

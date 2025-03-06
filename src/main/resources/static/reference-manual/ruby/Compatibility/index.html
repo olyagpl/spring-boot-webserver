@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -61,7 +82,7 @@
       <h1 id="compatibility">Compatibility</h1>
 
 <p>TruffleRuby aims to be fully compatible with the standard implementation of
-Ruby, MRI, version 3.1.3, <a href="#c-extension-compatibility">including C extensions</a>.
+Ruby, MRI, version 3.3.5, <a href="#c-extension-compatibility">including C extensions</a>.
 TruffleRuby is still in development, so it is not 100% compatible yet.</p>
 
 <p>TruffleRuby can run Rails and is compatible with many gems, including C extensions.
@@ -84,10 +105,24 @@ In a few limited cases, TruffleRuby is deliberately incompatible with MRI in ord
   <li><code>RUBY_REVISION</code> is the full <code>git</code> commit hash used to build TruffleRuby (similar to MRI 2.7+).</li>
   <li><code>RUBY_RELEASE_DATE</code> is the <code>git</code> commit date.</li>
   <li><code>RUBY_PATCHLEVEL</code> is always zero.</li>
-  <li><code>RUBY_ENGINE_VERSION</code> is the GraalVM version, or <code>0.0-</code> and the Git commit hash if your build is not part of a GraalVM release.</li>
+  <li><code>RUBY_ENGINE_VERSION</code> is the TruffleRuby version, or <code>0.0-</code> and the Git commit hash if your build is not part of a TruffleRuby release.</li>
 </ul>
 
 <p>In the C API, the preprocessor macro <code>TRUFFLERUBY</code> is defined, which can be checked with <code>#ifdef TRUFFLERUBY</code>.</p>
+
+<h2 id="ruby-3x-features">Ruby 3.x Features</h2>
+
+<p>Most features of Ruby 3.2 and earlier are supported in TruffleRuby.
+However some features are not yet implemented.
+See the following issues for details:</p>
+
+<ul>
+  <li><a href="https://github.com/oracle/truffleruby/issues/3039">Ruby 3.2 features</a></li>
+  <li><a href="https://github.com/oracle/truffleruby/issues/2733">Ruby 3.1 features</a></li>
+  <li><a href="https://github.com/oracle/truffleruby/issues/2453">Ruby 3.0 features</a></li>
+  <li><a href="https://github.com/oracle/truffleruby/issues/3332">Pattern Matching</a></li>
+  <li><a href="https://github.com/oracle/truffleruby/issues/3038">Endless methods</a></li>
+</ul>
 
 <h2 id="features-entirely-missing">Features Entirely Missing</h2>
 
@@ -166,6 +201,10 @@ The JVM enforces a maximum array size of 2<sup>31</sup>-1 (by storing the size i
 That is, Strings must be smaller than 2GB. This is the same restriction as JRuby.
 A possible workaround could be to use natively-allocated strings, but it would be a large effort to support every Ruby String operation on native strings.</p>
 
+<h3 id="strings-in-utf-16-and-utf-32-encoding">Strings in UTF-16 and UTF-32 encoding</h3>
+
+<p>TruffleRuby does not support UTF-16 strings with an odd number of bytes. Similarly, with UTF-32 it needs to be a multiple of 4. This is necessary for optimizations, compression, invariants, etc.</p>
+
 <h3 id="threads-detect-interrupts-at-different-points">Threads detect interrupts at different points</h3>
 
 <p>TruffleRuby threads may detect that they have been interrupted at different points in the program compared to where they would on MRI.
@@ -186,21 +225,30 @@ For example, if you <code>$stdout.reopen</code>, as some logging frameworks do, 
 
 <h3 id="signals">Signals</h3>
 
-<p>The set of signals that TruffleRuby can handle is different from MRI.
-When using the native configuration, TruffleRuby allows trapping all the same signals that MRI does, as well as a few that MRI does not.
-The only signals that can’t be trapped are <code>KILL</code>, <code>STOP</code>, and <code>VTALRM</code>.
+<p>First, <code>KILL</code> and <code>STOP</code> can never be trapped, per POSIX (<code>man 2 signal</code>).
+Some signals are reserved on CRuby, and they are also reserved on TruffleRuby, because trapping those would cause all sorts of problems: <code>SEGV</code>, <code>BUS</code>, <code>ILL</code>, <code>FPE</code> and <code>VTALRM</code>.</p>
+
+<p>When using the native configuration, TruffleRuby allows trapping all the same signals that MRI does.
 Consequently, any signal handling code that runs on MRI can run on TruffleRuby without modification in the native configuration.</p>
 
-<p>However, when run on the JVM, TruffleRuby is unable to trap <code>USR1</code> or <code>QUIT</code>, as these signals are reserved by the JVM.
-In such a case <code>trap(:USR1) {}</code> will raise an <code>ArgumentError</code>.
-Any code that relies on being able to trap those signals will need to fall back to another available signal.
-Additionally, <code>FPE</code>, <code>ILL</code>, <code>KILL</code>, <code>SEGV</code>, <code>STOP</code>, and <code>VTALRM</code> cannot be trapped, but these signals are also unavailable on MRI.</p>
+<p>However, when run on the JVM, TruffleRuby is unable to trap <code>QUIT</code>, as this signal is reserved by the JVM.
+In such a case <code>trap(:QUIT) {}</code> will raise an <code>ArgumentError</code>.
+Any code that relies on being able to trap this signal will need to fall back to another available signal.</p>
 
 <p>When TruffleRuby is run as part of a polyglot application, any signals that are handled by another language become unavailable for TruffleRuby to trap.</p>
 
 <h3 id="gc-statistics">GC statistics</h3>
 
 <p>TruffleRuby provides similar <code>GC.stat</code> statistics to MRI, but not all statistics are available, and some statistics may be approximations. Use <code>GC.stat.keys</code> to see which are provided with real or approximate values. Missing values will return <code>0</code>.</p>
+
+<h3 id="caller-locations">Caller locations</h3>
+
+<p>Using <code>Kernel#caller_locations</code> or <code>Thread.each_caller_location</code> might contain engine specific location objects and/or
+paths. This is expected and should be filtered in application code where necessary.</p>
+
+<p>The enumerator returned by <code>Thread.to_enum(:each_caller_location)</code> is not supporting iteration with <code>.next</code>. In CRuby
+this raises a <code>StopIteration</code>, while in TruffleRuby it iterates on an undetermined (related to where and how <code>.next</code> is
+called) call stack. It is not recommended to use this in any circumstance (neither CRuby nor TruffleRuby).</p>
 
 <h2 id="features-with-very-low-performance">Features with Very Low Performance</h2>
 
@@ -302,7 +350,7 @@ summarizes how many specs TruffleRuby passes.</p>
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -311,7 +359,7 @@ summarizes how many specs TruffleRuby passes.</p>
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -335,19 +383,6 @@ summarizes how many specs TruffleRuby passes.</p>
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 

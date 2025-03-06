@@ -43,12 +43,33 @@
       <div class="col-12 col-sm-12 col-md-12 col-lg-10">
         <div class="d-flex">
           <a href="https://www.graalvm.org/">
-            <img src="resources/img/logo_header.svg" alt="GraalVM logo">
+            <img src='/resources/img/logo_header.svg' alt="GraalVM logo">
           </a>  
         </div>
       </div>
     </div>
   </div>
+  <!-- <div>
+    <div class="row">
+      <div class="docsnote">
+        <div class="docsnote__body">
+          <div class="docsnote__column">
+            <div class="docsnote__card">
+              <div class="container">
+                <div class="rightside">
+                  <img src='/resources/img/note-icon-docs-light.svg'>
+                  <p class="docsnote__subtitle">
+                    This documentation is for an old GraalVM version. See the 
+                    <a href="#" onclick="selected('latest', 'latest'); return false;">latest version</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
 </header>
       <main class="content content--home wrapper" aria-label="Content">
         <div class="wrapper wrapper-content">
@@ -79,6 +100,22 @@ The JVM configuration automatically has access to other languages.</p>
   <li><a href="#embedded-configuration">Embedded configuration</a></li>
 </ul>
 
+<h2 id="installing-other-languages">Installing Other Languages</h2>
+
+<p>To use other GraalVM languages, you need the <a href="/reference-manual/ruby/#getting-started">JVM Standalone</a>.
+The Native Standalone does not support installing extra languages.</p>
+
+<p>Note that <code>ruby</code>, <code>llvm</code> and host Java interop are available without installing anything extra.</p>
+
+<p>Then you can install other languages with <code>truffleruby-polyglot-get $LANGUAGE</code>, for instance:</p>
+<pre><code class="language-bash">truffleruby-polyglot-get js
+truffleruby-polyglot-get python
+truffleruby-polyglot-get wasm
+truffleruby-polyglot-get java # for Java on Truffle (aka Espresso)
+</code></pre>
+
+<p>In TruffleRuby versions before 23.1 this was done through installing GraalVM (e.g. via <code>truffleruby+graalvm</code>) and using <code>gu install $LANGUAGE</code>.</p>
+
 <h2 id="running-ruby-code-from-another-language">Running Ruby Code from Another Language</h2>
 
 <p>When you <code>eval</code> Ruby code from the <a href="https://www.graalvm.org/sdk/javadoc/org/graalvm/polyglot/Context.html">Context API</a> in another language and mark the <code>Source</code> as interactive, the same interactive top-level binding is used each time.
@@ -88,6 +125,8 @@ This means that if you set a local variable in one <code>eval</code>, you will b
 This is similar to most REPL semantics.</p>
 
 <h2 id="loading-code-written-in-foreign-languages">Loading Code Written in Foreign Languages</h2>
+
+<p>Note the ruby command line needs to be passed <code>--polyglot</code> to enable access to foreign languages.</p>
 
 <p><code>Polyglot.eval(id, string)</code> executes code in a foreign language identified by its ID.</p>
 
@@ -171,13 +210,15 @@ This is similar to most REPL semantics.</p>
 
 <h3 id="rescuing-foreign-exceptions">Rescuing Foreign Exceptions</h3>
 
-<p>Foreign exceptions can be caught by <code>rescue Polyglot::ForeignException =&gt; e</code> or by <code>rescue foreign_meta_object</code>.
-It is possible to rescue any exception (Ruby or foreign) with <code>rescue Exception =&gt; e</code>.</p>
+<p>Foreign exceptions are represented by a <code>Polyglot::ForeignException</code> class so can be caught by <code>rescue Polyglot::ForeignException =&gt; e</code>.
+The <code>Polyglot::ForeignException</code> class inherits <code>StandardError</code> so <code>rescue =&gt; e</code> can be used instead.</p>
 
-<p>This naturally stems from the ancestors of a foreign exception:</p>
+<p>Any foreign exception has the following ancestors:</p>
 <pre><code class="language-ruby">Java.type("java.lang.RuntimeException").new.class.ancestors
-# =&gt; [Polyglot::ForeignException, Polyglot::ExceptionTrait, Polyglot::ObjectTrait, Exception, Object, Kernel, BasicObject]
+# =&gt; [Polyglot::ForeignException, Polyglot::ExceptionTrait, Polyglot::ObjectTrait, StandardError, Exception, Object, Kernel, BasicObject]
 </code></pre>
+
+<p>A specific foreign exception could be caught using a foreign exception class, e.g. <code>rescue Java.type("java.lang.NumberFormatException") =&gt; e</code>.</p>
 
 <h2 id="accessing-java-objects">Accessing Java Objects</h2>
 
@@ -187,8 +228,7 @@ It is possible to rescue any exception (Ruby or foreign) with <code>rescue Excep
 See <a href="/reference-manual/embed-languages/#build-native-images-from-polyglot-applications">here</a> for more details.</p>
 
 <p><code>Java.type('name')</code> returns a Java type, given a name such as <code>java.lang.Integer</code> or <code>int[]</code>.
-With the type object, <code>.new</code> will create an instance, <code>.foo</code> will call the static method <code>foo</code>, <code>[:FOO]</code> will read the static field
-<code>FOO</code>, and so on.
+With the type object, <code>.new</code> will create an instance, <code>.foo</code> will call the static method <code>foo</code>, <code>.FOO</code> or <code>[:FOO]</code> will read the static field <code>FOO</code>, and so on.
 To access methods of the <code>java.lang.Class</code> instance, use <code>[:class]</code>, such as <code>MyClass[:class].getName</code>.
 You can also go from the <code>java.lang.Class</code> instance to the Java type by using <code>[:static]</code>.</p>
 
@@ -299,6 +339,21 @@ functionality.</p>
 <p>Note: Unlike for example pure JavaScript, Ruby is more than a self-contained expression language.
 It has a large core library that includes low-level I/O and system and native-memory routines which may interfere with other embedded contexts or the host system.</p>
 
+<h2 id="inner-contexts">Inner Contexts</h2>
+
+<p>TruffleRuby supports creating <em>inner contexts</em>, that is multiple isolated execution/evaluation contexts (this is generally supported in GraalVM languages).
+Conceptually it is similar to running multiple Ruby interpreters in the same process.
+This can also be used with other languages, so for instance the outer/default context might run some Ruby code and some inner contexts run JavaScript code.
+This is very useful to interoperate with languages which do not support shared-memory multithreading like JavaScript, as one can then create one or more inner contexts per thread and still have the outer context use multithreaded Ruby.</p>
+
+<p>Objects from an inner context can be passed to other contexts and they are treated as foreign objects:</p>
+<pre><code class="language-ruby">Polyglot::InnerContext.new do |context|
+  context.eval('ruby', "p Object.new") # prints #&lt;Object:0xd8&gt;
+  p context.eval('ruby', "Object.new") # prints #&lt;Polyglot::ForeignObject[Ruby] Object:0x131d576b&gt;
+end
+</code></pre>
+<p>This works by automatically wrapping every object leaving its context in a proxy, which means e.g. if a method is called on a foreign object it is executed in the context to which the object belongs.</p>
+
       </div>
   </div>
 </div>
@@ -311,7 +366,7 @@ It has a large core library that includes low-level I/O and system and native-me
     <div class="row footer-content">
       <div class="footer__columns">
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">API Documentation</h6>
+          <h6 class="title-footer">API Documentation</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://www.graalvm.org/sdk/javadoc/">GraalVM SDK Javadoc</a></li>
@@ -320,7 +375,7 @@ It has a large core library that includes low-level I/O and system and native-me
           </div>
         </div>
         <div class="footer__columns-item">
-          <h6 class="title-footer" onclick="fadeInAndOut(this)">Learn More</h6>
+          <h6 class="title-footer">Learn More</h6>
           <div class="grow">
             <ul class="footer-list">
               <li class="footer-list__item"><a href="https://github.com/oracle/graal/" target="_blank">Open Source Repository</a></li>
@@ -344,19 +399,6 @@ It has a large core library that includes low-level I/O and system and native-me
     </div>
   </div>
 </footer>
-
-<script>
-  function fadeInAndOut(thz) {
-    var elmt = thz.nextElementSibling;//Get the element that is below the button that
-    //was just clicked
-    if (elmt.clientHeight) {
-      elmt.style.height = 0;
-    } else {
-      var wrapper = elmt.querySelector('ul');
-      elmt.style.height = wrapper.clientHeight + "px";
-    }
-  }
-</script>
 
     </div>
 
