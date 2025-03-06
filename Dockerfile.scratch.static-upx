@@ -14,7 +14,7 @@ RUN microdnf -y install wget xz && \
     rm -rf ${UPX_ARCHIVE} && \
     mv upx-${UPX_VERSION}-amd64_linux/upx . && \
     rm -rf upx-${UPX_VERSION}-amd64_linux
-RUN ./upx --lzma --best -o target/webserver.static-upx target/webserver.static
+RUN ./upx --lzma --best -o /webserver/target/webserver.static-upx /webserver/target/webserver.static
 
 # Scratch--fully static and compressed
 FROM scratch
