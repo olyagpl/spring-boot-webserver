@@ -5,4 +5,4 @@
 # ./mvnw -Dmaven.test.skip=true -Pdynamic-size-optimized native:compile
 
 # Distroless Java Base-provides glibc and other libraries needed by the JDK
-docker build --no-cache . -f Dockerfile.distroless-java-base.dynamic-optimized -t webserver:distroless-java-base.dynamic-optimized
+docker build . -f Dockerfile.distroless-java-base.dynamic-optimized -t webserver:distroless-java-base.dynamic-optimized

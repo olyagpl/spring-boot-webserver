@@ -4,11 +4,29 @@ WORKDIR /webserver
 # Build a dynamically linked native image with optimization for size
 RUN ./mvnw -Dmaven.test.skip=true -Pdynamic-size-optimized native:compile
 
+# Install and use UPX
+ARG UPX_VERSION=4.2.2
+ARG UPX_ARCHIVE=upx-${UPX_VERSION}-amd64_linux.tar.xz
+RUN microdnf -y install wget xz && \
+    wget -q https://github.com/upx/upx/releases/download/v${UPX_VERSION}/${UPX_ARCHIVE} && \
+    tar -xJf ${UPX_ARCHIVE} && \
+    rm -rf ${UPX_ARCHIVE} && \
+    mv upx-${UPX_VERSION}-amd64_linux/upx . && \
+    rm -rf upx-${UPX_VERSION}-amd64_linux
+RUN ./upx --lzma --best -o /webserver/target/webserver.dynamic-optimized-upx /webserver/target/webserver.dynamic-optimized
+
+# Scratch--fully static and compressed
+# FROM scratch
+# WORKDIR /tmp
+# COPY --from=nativebuild /webserver/target/webserver.static-upx /
+# EXPOSE 8000
+# ENTRYPOINT ["/webserver.static-upx", "-b", "0.0.0.0", "-d", "/web"]
+
 # Distroless Java Base-provides glibc and other libraries needed by the JDK
 FROM gcr.io/distroless/java-base-debian12
-COPY --from=nativebuild /webserver/target/webserver.dynamic-optimized /
+COPY --from=nativebuild /webserver/target/webserver.dynamic-optimized-upx /
 EXPOSE 8000
-ENTRYPOINT ["/webserver.dynamic-optimized", "-b", "0.0.0.0", "-d", "/web"]
+ENTRYPOINT ["/webserver.dynamic-optimized-upx", "-b", "0.0.0.0", "-d", "/web"]
 
 # FROM gcr.io/distroless/java-base-debian12
 # COPY target/webserver.dynamic-optimized /
