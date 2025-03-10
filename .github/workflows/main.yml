@@ -15,39 +15,39 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
     - name: Run Spring Boot Web Server
       run: |
-        # Build JAR (Debian Slim)
-        ./build-jar-java-base.sh
-        ./build-jar-slim.sh
-        #
+        # # Build JAR (Debian Slim)
+        # ./build-jar-java-base.sh
+        # ./build-jar-slim.sh
+        # #
 
-        # Build Jlink custom runtime (Distroless Java Base)
-        ./build-jlink.sh
-        #
+        # # Build Jlink custom runtime (Distroless Java Base)
+        # ./build-jlink.sh
+        # #
 
-        # Build dynamic image (Distroless Java Base)
-        ./build-dynamic-image.sh
-        #
+        # # Build dynamic image (Distroless Java Base)
+        # ./build-dynamic-image.sh
+        # #
 
-        # Build dynamic image, optimized for size (Distroless Java Base)
-        ./build-dynamic-image-optimized.sh
-        #
+        # # Build dynamic image, optimized for size (Distroless Java Base)
+        # ./build-dynamic-image-optimized.sh
+        # #
         
-        # Setup musl toolchain
-        ./setup-musl.sh
-        export PATH="$PWD/musl-toolchain/bin:$PATH"
-        #
+        # # Setup musl toolchain
+        # ./setup-musl.sh
+        # export PATH="$PWD/musl-toolchain/bin:$PATH"
+        # #
 
-        # Build mostly static image (Distroless Base)
-        ./build-mostly-static-image.sh
-        #
+        # # Build mostly static image (Distroless Base)
+        # ./build-mostly-static-image.sh
+        # #
 
-        # Build fully static image (Alpine)
-        ./build-alpine-static-image.sh
-        #
+        # # Build fully static image (Alpine)
+        # ./build-alpine-static-image.sh
+        # #
 
-        # Build fully static image (Scratch)
-        ./build-static-image.sh
-        #
+        # # Build fully static image (Scratch)
+        # ./build-static-image.sh
+        # #
 
         # Download upx
         ./setup-upx.sh
