@@ -21,7 +21,7 @@ RUN ./upx --lzma --best -o /webserver/target/webserver.static-upx /webserver/tar
 # Scratch--fully static and compressed
 FROM scratch
 WORKDIR /tmp
-COPY --from=nativebuild webserver/target/webserver.static-upx /
+COPY --from=nativebuild webserver/target/webserver.static /
 EXPOSE 8000
 ENTRYPOINT ["/webserver.static-upx", "-b", "0.0.0.0", "-d", "/web"]
 
