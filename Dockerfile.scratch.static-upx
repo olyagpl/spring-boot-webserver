@@ -1,5 +1,4 @@
 FROM container-registry.oracle.com/graalvm/native-image:23-muslib AS nativebuild
-# FROM --platform=linux/g container-registry.oracle.com/graalvm/native-image:23-muslib AS nativebuild
 COPY . /webserver
 WORKDIR /webserver
 
@@ -16,17 +15,11 @@ RUN microdnf -y install wget xz && \
 # Build a fully static native image with optimization for size
 RUN  ./mvnw -Dmaven.test.skip=true -Pnative,fully-static native:compile
 RUN ls -lh /webserver/target
-RUN ./upx --lzma --best -o webserver.static-upx /webserver/target/webserver.static
+RUN ./upx --lzma --best -o /webserver/webserver.static-upx /webserver/target/webserver.static
 
 # Scratch--fully static and compressed
 FROM scratch
 WORKDIR /tmp
-COPY --from=nativebuild /webserver/webserver.static-upx /
+COPY --from=nativebuild /webserver/webserver.static-upx /webserver/webserver.static-upx
 EXPOSE 8000
-ENTRYPOINT ["/webserver.static-upx", "-b", "0.0.0.0", "-d", "/web"]
-
-# FROM scratch
-# WORKDIR /tmp
-# COPY target/webserver.static-upx /
-# EXPOSE 8080
-# ENTRYPOINT ["/webserver.static-upx"]
+ENTRYPOINT ["/webserver/webserver.static-upx", "-b", "0.0.0.0", "-d", "/web"]
