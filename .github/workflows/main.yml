@@ -56,13 +56,4 @@ jobs:
         # Build fully static compressed image (Scratch UPX)
         ./build-static-upx-image.sh
         #
-
-        # Compare file sizes
-        ls -lh target/webserver*
         docker images webserver
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v4
-      with:
-          name: native-binaries-${{ matrix.os }}
-          path: |
-            target/webserver*
