@@ -1,9 +1,6 @@
 #!/bin/sh
 
 # For local building
-# rm -f target/webserver.static-upx
-
-# Compress with UPX
 # ./upx --lzma --best -o target/webserver.static-upx target/webserver.static
 
 # Scratch--fully static and compressed

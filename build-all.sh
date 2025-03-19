@@ -1,10 +1,10 @@
 #!/bin/sh 
 
 ./build-jar-java-base.sh
-./build-jar-slim.sh
 ./build-jlink.sh
 ./build-dynamic-image.sh
 ./build-dynamic-image-optimized.sh
+./build-dynamic-image-skipflow.sh
 ./build-mostly-static-image.sh
 ./build-static-image.sh
 ./build-alpine-static-image.sh

@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # For local building
-# Compile with fully dynamically linked shared libraries
 # ./mvnw -Dmaven.test.skip=true native:compile
 
 # Distroless Java Base-provides glibc and other libraries needed by the JDK
