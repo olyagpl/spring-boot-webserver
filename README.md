@@ -4,7 +4,7 @@ This workshop focuses on how to **build size-optimized native applications** usi
 You are going to discover ways to minimize application footprint by taking advantage of different Native Image linking options, and packaging a size-compact application into various containers, focusing on two main strategies: Distroless and static, discussing the trade-offs.
 Every step is a multistage build using the [Oracle GraalVM container image](https://container-registry.oracle.com/ords/ocr/ba/graalvm) for the builder and different containers for the runner.
 
-For the demo part, you will run a Spring Boot web server application, hosting the GraalVM website latest release documentation. 
+For the demo part, you will run a Spring Boot web server application, hosting the GraalVM website latest release documentation.
 Spring Boot 3 has integrated support for GraalVM Native Image, making it easier to set up and configure a project.
 Compiling a Spring Boot application ahead of time can significantly improve the performance and reduce its footprint.
 
@@ -34,7 +34,7 @@ In this workshop you will:
 
 Clone this repository with Git and enter the application directory:
 ```bash
-git clone https://github.com/olyagpl/spring-boot-webserver.git 
+git clone https://github.com/olyagpl/spring-boot-webserver.git
 ```
 ```bash
 cd spring-boot-webserver
@@ -42,7 +42,7 @@ cd spring-boot-webserver
 
 ## **STEP 1**: Compile and Run the Application from a JAR File Inside a Container
 
-Start by compiling and running the application from a JAR file inside a Docker container. 
+Start by compiling and running the application from a JAR file inside a Docker container.
 It requires a container image with a full JDK and runtime libraries.
 
 ### Explanation
@@ -61,7 +61,7 @@ The entrypoint for this image is equivalent to `java -jar`, so only a path to a 
     ```bash
     docker run --rm -p8080:8080 webserver:distroless-java-base.jar
     ```
-    The container started in hundreds of milliseconds, **1.135 seconds**.
+    The container started in hundreds of milliseconds, **1.081 seconds**.
 
 3. Open a browser and navigate to [localhost:8080/](http://localhost:8080/). You see the GraalVM documentation pages served.
 
@@ -72,13 +72,13 @@ The entrypoint for this image is equivalent to `java -jar`, so only a path to a 
     docker images
     ```
     ```
-    REPOSITORY   TAG               IMAGE ID       CREATED             SIZE
-    webserver    distroless-java-base.jar   3794608e7fd5   21 minutes ago   245MB
+    REPOSITORY   TAG                        IMAGE ID       CREATED          SIZE
+    webserver    distroless-java-base.jar   3794608e7fd5   21 minutes ago   235MB
     ```
     Note that the website pages added **44MB** to the total size.
 
 ## **STEP 2**: Build and Run a Jlink Custom Runtime Image Inside a Container
- 
+
 In this step, you will create a custom runtime of this Spring Boot web server with Jlink and run it inside a container image.
 See how much reduction in size you can gain.
 
@@ -91,7 +91,7 @@ The script _build-jlink.sh_ that runs `docker build` using the _Dockerfile.distr
 The Dockerfile runs two stages: first it generates a Jlink custom runtime on a full JDK (`container-registry.oracle.com/graalvm/jdk:24`); then copies the runtime image folder along with static website pages into a Distroless Java base image, and sets the entrypoint.
 Distroless Java base image provides `glibc` and other libraries needed by the JDK, but not a full-blown JDK.
 
-The application does not have to be modular, but you need to figure out which modules the application depends on to be able to `jlink` it. 
+The application does not have to be modular, but you need to figure out which modules the application depends on to be able to `jlink` it.
 In the builder stage, running on a full JDK, after compiling the project, Docker creates a file _cp.txt_ containing the classpath with all the dependencies:
 ```
 RUN ./mvnw dependency:build-classpath -Dmdep.outputFile=cp.txt
@@ -115,7 +115,7 @@ The `ENTRYPOINT` for the application would be `java` from the custom runtime.
     docker run --rm -p8080:8080 webserver:distroless-java-base.jlink
     ```
 
-    The container started in **1.224 seconds**.
+    The container started in **1.102 seconds**.
 
 3. Open a browser and navigate to [localhost:8080/](http://localhost:8080/). You see the GraalVM documentation pages served.
 
@@ -128,21 +128,21 @@ The `ENTRYPOINT` for the application would be `java` from the custom runtime.
     The expected output is:
     ```
     REPOSITORY   TAG                          IMAGE ID       CREATED          SIZE
-    webserver    distroless-java-base.jlink   72ceaa8a8dfd   9 minutes ago    198MB
-    webserver    distroless-java-base.jar     3794608e7fd5   47 minutes ago   245MB
+    webserver    distroless-java-base.jlink   72ceaa8a8dfd   9 minutes ago    188MB
+    webserver    distroless-java-base.jar     3794608e7fd5   47 minutes ago   235MB
     ```
     Jlink shrinked the `distroless-java-base.jar` container by **47MB**.
 
 ## **STEP 3**: Build and Run a Native Image Inside a Container Using Paketo Buildpacks
 
-In this step, you will compile this Spring Boot application ahead of time with GraalVM Native Image and run it using Paketo Buildpacks container images. 
+In this step, you will compile this Spring Boot application ahead of time with GraalVM Native Image and run it using Paketo Buildpacks container images.
 
 ### Explanation
 
-Spring Boot supports building a native image in a container using the [Paketo Buildpack for Oracle](https://github.com/paketo-buildpacks/oracle) which provides GraalVM Native Image. 
+Spring Boot supports building a native image in a container using the [Paketo Buildpack for Oracle](https://github.com/paketo-buildpacks/oracle) which provides GraalVM Native Image.
 
-The mechanism is that the Paketo builder pulls the [Jammy Tiny Stack image](https://github.com/paketo-buildpacks/builder-jammy-tiny) (Ubuntu distroless-like image) which contains no buildpacks. 
-Then you point the **builder** image to the **creator** image. 
+The mechanism is that the Paketo builder pulls the [Jammy Tiny Stack image](https://github.com/paketo-buildpacks/builder-jammy-tiny) (Ubuntu distroless-like image) which contains no buildpacks.
+Then you point the **builder** image to the **creator** image.
 For this workshop, you point to the [Paketo Buildpack for Oracle](https://github.com/paketo-buildpacks/oracle) explicitly requesting the Native Image tool.
 
 If you open the _pom.xml_ file, you see the `spring-boot-maven-plugin` declaration added for you:
@@ -160,7 +160,7 @@ If you open the _pom.xml_ file, you see the `spring-boot-maven-plugin` declarati
 When `java-native-image` is requested, the buildpack downloads Oracle GraalVM, which includes Native Image.
 The [Paketo documentation provides several examples](https://paketo.io/docs/howto/java/#build-an-app-as-a-graalvm-native-image-application) that show you how to build applications with Native Image using buildpacks.
 
-> Note that if you do not specify Oracle's buildpack, it will pull the default buildpack, which can result in reduced performance. 
+> Note that if you do not specify Oracle's buildpack, it will pull the default buildpack, which can result in reduced performance.
 
 ### Action
 
@@ -173,7 +173,7 @@ The [Paketo documentation provides several examples](https://paketo.io/docs/howt
     ```bash
     docker run --rm -p8080:8080 docker.io/library/webserver.buildpacks:latest
     ```
-    
+
     The application is running from the native image inside a container. The container started in just **0.031 seconds**!
 
 3. Open a browser and navigate to [localhost:8080/](http://localhost:8080/). You see the GraalVM documentation pages served.
@@ -187,9 +187,9 @@ The [Paketo documentation provides several examples](https://paketo.io/docs/howt
     The expected output is:
     ```
     REPOSITORY            TAG                          IMAGE ID       CREATED            SIZE
-    webserver             distroless-java-base.jlink   72ceaa8a8dfd   30 minutes ago     198MB
-    webserver             distroless-java-base.jar     3794608e7fd5   About an hour ago  245MB
-    webserver.buildpacks  latest                       10f1045f485b   45 years ago       160MB
+    webserver             distroless-java-base.jlink   72ceaa8a8dfd   30 minutes ago     188MB
+    webserver             distroless-java-base.jar     3794608e7fd5   About an hour ago  235MB
+    webserver.buildpacks  latest                       10f1045f485b   45 years ago       161MB
     ```
     The new container, tagged as _webserver.buildpacks:latest_, is **158MB**, smaller than the Jlink and distroless Java base versions.
 
@@ -214,7 +214,7 @@ The command will compile the application and create a fully dynamically linked n
 
 However, there is a Dockerfile, _Dockerfile.distroless-java-base.dynamic_, that runs the native image step inside the builder container, and then copies this native executable in a distroless base container with just enough to run the application. No Java Runtime Environment (JRE) is required!
 
-**Distroless container images** contain only your application and its runtime dependencies. 
+**Distroless container images** contain only your application and its runtime dependencies.
 They do not contain package managers, shells or any other programs you would expect to find in a standard Linux distribution.
 Learn more in ["Distroless" Container Images](https://github.com/GoogleContainerTools/distroless).
 
@@ -230,7 +230,7 @@ Learn more in ["Distroless" Container Images](https://github.com/GoogleContainer
     docker run --rm -p8080:8080 webserver:distroless-java-base.dynamic
     ```
 
-    The application is running from the native image inside a container. The container started in  **0.033 seconds**.
+    The application is running from the native image inside a container. The container started in  **0.032 seconds**.
 
 3. Open a browser and navigate to [localhost:8080/](http://localhost:8080/). You see the GraalVM documentation pages served.
 
@@ -243,15 +243,15 @@ Learn more in ["Distroless" Container Images](https://github.com/GoogleContainer
     The expected output is:
     ```bash
     REPOSITORY            TAG                            IMAGE ID       CREATED         SIZE
-    webserver             distroless-java-base.dynamic   d7c449b9373d   45 seconds ago  171MB
-    webserver             distroless-java-base.jlink     191efb04958d   2 hours ago     198MB
-    webserver             distroless-java-base.jar       846971900174   2 hours ago     245MB
-    webserver.buildpacks  latest                         615deed5b89c   45 years ago    160MB
+    webserver             distroless-java-base.dynamic   d7c449b9373d   45 seconds ago  160MB
+    webserver             distroless-java-base.jlink     191efb04958d   2 hours ago     188MB
+    webserver             distroless-java-base.jar       846971900174   2 hours ago     235MB
+    webserver.buildpacks  latest                         615deed5b89c   45 years ago    161MB
     ```
-    The new container image size, **171MB**, almost matches the size of the container built with Paketo Buildpacks. 
+    The new container image size, **160MB**, almost matches the size of the container built with Paketo Buildpacks.
     It is expected because it is the same native executable packaged into a different base container.
 
-    The size of the native executable itself is **122M**. 
+    The size of the native executable itself is **122M**.
     Note that the static resources are "baked" into this native executable and added 44M to its size.
 
 ## **STEP 5**: Build a Size-Optimized Native Image and Run Inside a Container
@@ -262,7 +262,7 @@ In this step, you will build a fully dynamically linked native image **with the 
 
 ### Explanation
 
-GraalVM Native Image provides the option `-Os` which optimizes the resulting native image for file size. 
+GraalVM Native Image provides the option `-Os` which optimizes the resulting native image for file size.
 `-Os` enables `-O2` optimizations except those that can increase code or executable size significantly.
 Learn more in [the Native Image documentation](https://www.graalvm.org/jdk24/reference-manual/native-image/optimizations-and-performance/#optimization-levels).
 
@@ -289,7 +289,7 @@ For that, a separate Maven profile is provided to differentiate this run from th
 
 The Dockerfile for this step, _Dockerfile.distroless-java-base.dynamic-optimized_, creates a native image which is fully dynamically linked and **optimized for size** inside the builder container, and then packages it in a distroless base container with just enough to run the application. No Java Runtime Environment (JRE) is required.
 
-> The `-Os` optimization will be on for all the subsequent builds. 
+> The `-Os` optimization will be on for all the subsequent builds.
 
 ### Action
 
@@ -316,15 +316,15 @@ The Dockerfile for this step, _Dockerfile.distroless-java-base.dynamic-optimized
     The expected output is:
     ```bash
     REPOSITORY            TAG                                      IMAGE ID       CREATED         SIZE
-    webserver             distroless-java-base.dynamic-optimized   5e16a58b1649   23 seconds ago  140MB
-    webserver             distroless-java-base.dynamic             d7c449b9373d   45 seconds ago  171MB
-    webserver             distroless-java-base.jlink               191efb04958d   2 hours ago     198MB
-    webserver             distroless-java-base.jar                 846971900174   2 hours ago     245MB
-    webserver.buildpacks  latest                                   615deed5b89c   45 years ago    160MB
+    webserver             distroless-java-base.dynamic-optimized   5e16a58b1649   23 seconds ago  125MB
+    webserver             distroless-java-base.dynamic             d7c449b9373d   45 seconds ago  160MB
+    webserver             distroless-java-base.jlink               191efb04958d   2 hours ago     188MB
+    webserver             distroless-java-base.jar                 846971900174   2 hours ago     235MB
+    webserver.buildpacks  latest                                   615deed5b89c   45 years ago    161MB
     ```
-    The size of `distroless-java-base.dynamic-optimized` container is cut down from **164MB** to **130MB**. 
+    The size of `distroless-java-base.dynamic-optimized` container is cut down from **164MB** to **130MB**.
     This is because the native executable reduced in size.
-    
+
     The size of the native executable decreased from **125M** to **92M**  by applying the file size optimization!
 
 ## **STEP 6**: Build a Size-Optimized Native Image with SkipFlow and Run Inside a Container
@@ -335,7 +335,7 @@ In this step, you will build another fully dynamically linked native image but w
 
 As of GraalVM for JDK 24, you can enable [SkipFlow](https://www.graalvm.org/release-notes/JDK_24/#native-image)-an extension to the Native Image static analysis that tracks primitive values and evaluates branching conditions dynamically during the process.
 
-The feature is experimental and can be enabled with the following host options: `-H:+TrackPrimitiveValues` and `-H:+UsePredicates`. 
+The feature is experimental and can be enabled with the following host options: `-H:+TrackPrimitiveValues` and `-H:+UsePredicates`.
 
 For that, a separate Maven profile is provided, giving a different name for the output file:
 ```xml
@@ -375,7 +375,7 @@ The Dockerfile for this step, _Dockerfile.distroless-java-base.dynamic-skipflow_
     docker run --rm -p8080:8080 webserver:distroless-java-base.dynamic-skipflow
     ```
 
-    The application is running from the native image inside a container. 
+    The application is running from the native image inside a container.
     The startup time has not changed.
 
 3. Open a browser and navigate to [localhost:8080/](http://localhost:8080/). You see the GraalVM documentation pages served.
@@ -389,14 +389,14 @@ The Dockerfile for this step, _Dockerfile.distroless-java-base.dynamic-skipflow_
     The expected output is:
     ```bash
     REPOSITORY            TAG                                      IMAGE ID       CREATED         SIZE
-    webserver             distroless-java-base.dynamic-skipflow    7c748db34ef4   3 minutes ago   138MB
-    webserver             distroless-java-base.dynamic-optimized   5e16a58b1649   23 seconds ago  140MB
-    webserver             distroless-java-base.dynamic             d7c449b9373d   45 seconds ago  171MB
-    webserver             distroless-java-base.jlink               191efb04958d   2 hours ago     198MB
-    webserver             distroless-java-base.jar                 846971900174   2 hours ago     245MB
-    webserver.buildpacks  latest                                   615deed5b89c   45 years ago    160MB
+    webserver             distroless-java-base.dynamic-skipflow    7c748db34ef4   3 minutes ago   123MB
+    webserver             distroless-java-base.dynamic-optimized   5e16a58b1649   23 seconds ago  125MB
+    webserver             distroless-java-base.dynamic             d7c449b9373d   45 seconds ago  160MB
+    webserver             distroless-java-base.jlink               191efb04958d   2 hours ago     188MB
+    webserver             distroless-java-base.jar                 846971900174   2 hours ago     235MB
+    webserver.buildpacks  latest                                   615deed5b89c   45 years ago    161MB
     ```
-    The gain is tiny: the container size reduced only by 2MB, from 140MB to **138MB**, but depending on the application, **SkipFlow can provide up to a 4% reduction in binary size without any additional impact on build time**.
+    The gain is tiny: the container size reduced only by 2MB, from 125MB to **123MB**, but depending on the application, **SkipFlow can provide up to a 4% reduction in binary size without any additional impact on build time**.
 
 ## **STEP 7**: Build a Size-Optimized Mostly Static Native Image and Run Inside a Container
 
@@ -455,22 +455,22 @@ A separate Maven profile exists for this step:
     The expected output is:
     ```bash
     REPOSITORY            TAG                                      IMAGE ID       CREATED         SIZE
-    webserver             distroless-base.mostly-static            2096b9d21750   6 seconds ago   127MB
-    webserver             distroless-java-base.dynamic-skipflow    7c748db34ef4   3 minutes ago   138MB
-    webserver             distroless-java-base.dynamic-optimized   5e16a58b1649   23 seconds ago  140MB
-    webserver             distroless-java-base.dynamic             d7c449b9373d   45 seconds ago  171MB
-    webserver             distroless-java-base.jlink               191efb04958d   2 hours ago     198MB
-    webserver             distroless-java-base.jar                 846971900174   2 hours ago     245MB
-    webserver.buildpacks  latest                                   615deed5b89c   45 years ago    160MB
+    webserver             distroless-base.mostly-static            2096b9d21750   6 seconds ago   112MB
+    webserver             distroless-java-base.dynamic-skipflow    7c748db34ef4   3 minutes ago   123MB
+    webserver             distroless-java-base.dynamic-optimized   5e16a58b1649   23 seconds ago  125MB
+    webserver             distroless-java-base.dynamic             d7c449b9373d   45 seconds ago  160MB
+    webserver             distroless-java-base.jlink               191efb04958d   2 hours ago     188MB
+    webserver             distroless-java-base.jar                 846971900174   2 hours ago     235MB
+    webserver.buildpacks  latest                                   615deed5b89c   45 years ago    161MB
     ```
 
-    The size of the new _distroless-base.mostly-static_ container is **127MB**.
+    The size of the new _distroless-base.mostly-static_ container is **112MB**.
     The reduction in size is related to the fact that a smaller base image was pulled: **gcr.io/distroless/base-debian12**.
-    [Distroless images](https://github.com/GoogleContainerTools/distroless) are very small, and the one used is only **48.3 MB**. 
+    [Distroless images](https://github.com/GoogleContainerTools/distroless) are very small, and the one used is only **48.3 MB**.
     That's about 50% of the size of **java-base-debian12**(124 MB) used before, and 3 times less than **java21-debian12** (192 MB) containing a full JDK.
 
     The size of the mostly static native image has not changed, and is **92MB**.
- 
+
 ## **STEP 8**: Build a Size-Optimized Fully Static Native Image and Run Inside a Container
 
 In this step, you will build a **fully static** native image, with the file size optimization on, and then package it into a _scratch_ container.
@@ -481,10 +481,10 @@ A **fully static** native image is a statically linked binary that you can use w
 You can create a static native image by statically linking it against `musl-libc`, a lightweight, fast, and simple `libc` implementation.
 To build a fully static executable, pass the `--static --libc=musl` options at build time.
 
-A fully static image **does not rely on any libraries in the operating system environment** and can be packaged in the tiniest container. 
+A fully static image **does not rely on any libraries in the operating system environment** and can be packaged in the tiniest container.
 
-It is easy to deploy on a slim or distroless container, even a [_scratch_ container](https://hub.docker.com/_/scratch). 
-A _scratch_ container is a [Docker official image](https://hub.docker.com/_/scratch), useful for building super minimal images.
+It is easy to deploy on a slim or distroless container, even a [_scratch_ container](https://hub.docker.com/_/scratch).
+A _scratch_ container is a [Docker official image](https://hub.docker.com/_/scratch), only 2MB in size, useful for building super minimal images.
 
 A separate Maven profile exists for this step:
 ```xml
@@ -508,7 +508,7 @@ A separate Maven profile exists for this step:
 </profile>
 ```
 
-### Action 
+### Action
 
 1. Run the script to build a fully static native executable and package it into a _scratch_ container:
     ```bash
@@ -532,21 +532,21 @@ A separate Maven profile exists for this step:
     The expected output is:
     ```bash
     REPOSITORY            TAG                                      IMAGE ID       CREATED         SIZE
-    webserver             scratch.static                           6cac69852631   3 minutes ago   91.3MB
-    webserver             distroless-base.mostly-static            2096b9d21750   6 seconds ago   127MB
-    webserver             distroless-java-base.dynamic-skipflow    7c748db34ef4   3 minutes ago   138MB
-    webserver             distroless-java-base.dynamic-optimized   5e16a58b1649   23 seconds ago  140MB
-    webserver             distroless-java-base.dynamic             d7c449b9373d   45 seconds ago  171MB
-    webserver             distroless-java-base.jlink               191efb04958d   2 hours ago     198MB
-    webserver             distroless-java-base.jar                 846971900174   2 hours ago     245MB
-    webserver.buildpacks  latest                                   615deed5b89c   45 years ago    160MB
+    webserver             scratch.static                           6cac69852631   3 minutes ago   91.8MB
+    webserver             distroless-base.mostly-static            2096b9d21750   6 seconds ago   112MB
+    webserver             distroless-java-base.dynamic-skipflow    7c748db34ef4   3 minutes ago   123MB
+    webserver             distroless-java-base.dynamic-optimized   5e16a58b1649   23 seconds ago  125MB
+    webserver             distroless-java-base.dynamic             d7c449b9373d   45 seconds ago  160MB
+    webserver             distroless-java-base.jlink               191efb04958d   2 hours ago     188MB
+    webserver             distroless-java-base.jar                 846971900174   2 hours ago     235MB
+    webserver.buildpacks  latest                                   615deed5b89c   45 years ago    161MB
     ```
 
-    The container size shrinked to **91.3MB**! A _scratch_ container weights only **14.5MB**.
+    The container size shrinked to **91.8MB**! A _scratch_ base image weights only **2MB**.
 
 #### For Local Building
 
-If you build a native image locally, it requires the `musl` toolchain with `zlib` installed on your machine. 
+If you build a native image locally, it requires the `musl` toolchain with `zlib` installed on your machine.
 We provide a script to download and configure the `musl` toolchain, and install `zlib` into the toolchain:
 ```bash
 ./setup-musl.sh
@@ -556,7 +556,7 @@ If you build a static native image locally, you can verify that is indeed fully 
 ```bash
 ldd target/webserver.static
 ```
-You should see "not a dynamic executable" for the response. 
+You should see "not a dynamic executable" for the response.
 
 ## **STEP 9**: Compress a Static Native Image with UPX and Run Inside a Container
 
@@ -566,7 +566,7 @@ In this step, you compress your fully static native image with UPX, then package
 
 ### Explanation
 
-[UPX](https://upx.github.io/) - an advanced executable file compressor. 
+[UPX](https://upx.github.io/) - an advanced executable file compressor.
 It can significantly reduce the executable size, but note, that UPX loads the executable into the memory, unpackages it, and then recompresses.
 
 For local building, we provide a script to download and install UPX:
@@ -604,14 +604,14 @@ Finally, the compressed executable copied over to the _scratch_ container, and e
     ```bash
     REPOSITORY            TAG                                      IMAGE ID       CREATED         SIZE
     webserver             scratch.static-upx                       becd77f9ea1a   1 second ago    34.5MB
-    webserver             scratch.static                           6cac69852631   3 minutes ago   91.3MB
-    webserver             distroless-base.mostly-static            2096b9d21750   6 seconds ago   127MB
-    webserver             distroless-java-base.dynamic-skipflow    7c748db34ef4   3 minutes ago   138MB
-    webserver             distroless-java-base.dynamic-optimized   5e16a58b1649   23 seconds ago  140MB
-    webserver             distroless-java-base.dynamic             d7c449b9373d   45 seconds ago  171MB
-    webserver             distroless-java-base.jlink               191efb04958d   2 hours ago     198MB
-    webserver             distroless-java-base.jar                 846971900174   2 hours ago     245MB
-    webserver.buildpacks  latest                                   615deed5b89c   45 years ago    160MB
+    webserver             scratch.static                           6cac69852631   3 minutes ago   91.8MB
+    webserver             distroless-base.mostly-static            2096b9d21750   6 seconds ago   112MB
+    webserver             distroless-java-base.dynamic-skipflow    7c748db34ef4   3 minutes ago   123MB
+    webserver             distroless-java-base.dynamic-optimized   5e16a58b1649   23 seconds ago  125MB
+    webserver             distroless-java-base.dynamic             d7c449b9373d   45 seconds ago  160MB
+    webserver             distroless-java-base.jlink               191efb04958d   2 hours ago     188MB
+    webserver             distroless-java-base.jar                 846971900174   2 hours ago     235MB
+    webserver.buildpacks  latest                                   615deed5b89c   45 years ago    161MB
     ```
     The container size reduced dramatically to just **34.5MB**!
     The `upx` tool compressed the static native image by almost **57MB**.
@@ -619,7 +619,7 @@ Finally, the compressed executable copied over to the _scratch_ container, and e
 
 ## **STEP 10**: Clean up (Optional)
 
-To clean up all images, run the `./clean.sh` script provided for that purpose. 
+To clean up all images, run the `./clean.sh` script provided for that purpose.
 
 ## Conclusions
 
@@ -630,15 +630,17 @@ Sorted by size, it is clear that the fully static native image, compressed with 
 
 | Container                              | Size of a build artefact <br> (JAR, Jlink runtime, native executable) | Base image | Container |
 |----------------------------------------|-----------------------------------------------------------------------|------------|-----------|
-| distroless-java-base.jar               | webserver-0.0.1-SNAPSHOT.jar **44MB**                                 | 192MB      | 245MB     |
-| distroless-java-base.jlink             | jlink-jre custom runtime **68MB**                                     | 128MB      | 198MB     |
-| distroless-java-base.dynamic           | webserver.dynamic **122MB**                                           | 128MB      | 171MB     |
-| webserver.buildpacks:latest            |                                                                       |            | 160MB     |
-| distroless-java-base.dynamic-optimized | webserver.dynamic-optimized **92MB**                                  | 128MB      | 140MB     |
-| distroless-java-base.dynamic-skipflow  | webserver.dynamic-skipflow **90MB**                                   | 128MB      | 138MB     |
-| distroless-base.mostly-static          | webserver.mostly-static **92MB**                                      | 48.3MB     | 127MB     |
-| scratch.static                         | webserver.scratch.static **92MB**                                     | 14.5MB     | 91.3MB    |
-| scratch.static-upx                     | webserver.scratch.static-upx **35MB**                                 | 14.5MB     | 34.5MB    |
+| eclispe-temurin-jar                    | webserver-0.0.1-SNAPSHOT.jar **42MB**              | eclipse-temurin:21 201 MB     | 522MB     |
+| distroless-java-base.jar               | webserver-0.0.1-SNAPSHOT.jar **42MB**              | java21-debian12 192MB         | 235MB     |
+| distroless-java-base.jlink             | jlink-jre custom runtime **68MB**                  | java-base-debian12 128MB      | 188MB     |
+| distroless-java-base.dynamic           | webserver.dynamic **122MB**                        | java-base-debian12 128MB      | 161MB     |
+| webserver.buildpacks:latest            |                                                    |                               | 161MB     |
+| distroless-java-base.dynamic-optimized | webserver.dynamic-optimized **88MB**               | java-base-debian12 128MB      | 125MB     |
+| distroless-java-base.dynamic-skipflow  | webserver.dynamic-skipflow **86MB**                | java-base-debian12 128MB      | 123MB     |
+| distroless-base.mostly-static          | webserver.mostly-static **88MB**                   | base-debian12 48.3MB          | 112MB     |
+| scratch.static-alpine                  | webserver.static **88MB**                          | alpine:3 5MB                  | 100MB     |
+| scratch.static                         | webserver.static **88MB**                          | scratch 2MB                   | 91.8MB    |
+| scratch.static-upx                     | webserver.scratch.static-upx **33MB**              | scratch 2MB                   | 34.5MB    |
 
 ## Learn More
 

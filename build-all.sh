@@ -1,6 +1,7 @@
-#!/bin/sh 
+#!/bin/sh
 
 ./build-jar-java-base.sh
+./build-jar-eclipse-temurin.sh
 ./build-jlink.sh
 ./build-dynamic-image.sh
 ./build-dynamic-image-optimized.sh
