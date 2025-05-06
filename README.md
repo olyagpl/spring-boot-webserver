@@ -12,13 +12,12 @@ Compiling a Spring Boot application ahead of time can significantly improve the 
 
 In this workshop you will:
 
-- Learn how to compile a Spring Boot application ahead of time into a native image and optimize it for file size.
-- Use the latest [SkipFlow feature](https://www.graalvm.org/release-notes/JDK_24/#native-image) to optimize the file size even more, without any additional impact on build time. (As of GraalVM for JDK 24.)
+- Leverage containerization approach to optimize the runtime environment.
+- Compile a Spring Boot application ahead of time into a native image and optimize it for file size using either GraalVM or Paketo Buildpacks.
 - See how to use the [Maven plugin for Native Image](https://graalvm.github.io/native-build-tools/latest/maven-plugin.html).
-- Create native executables and run them inside different Docker containers.
-- Shrink a container image size by taking advantage of different Native Image linking options.
-- Compare the deployed container images sizes.
-- See how to use GitHub Actions to automate the build of native executables as part of a CI/CD pipeline.
+- Use the latest [SkipFlow feature](https://medium.com/graalvm/skipflow-producing-smaller-executables-with-graalvm-f18ca98279c2) to optimize the file size even more, without any additional impact on build time. (As of GraalVM for JDK 24.)
+- Reduce containers size by taking advantage of different Native Image static linking options.
+- Compare the deployed container images sizes and discuss the trade offs, focusing on two main strategies: Distroless and static.
 
 ### Prerequisites
 
